@@ -23,11 +23,11 @@ const SCENE_CELLS_HEIGHT = 100;
 const CELL_SIZE = 25;
 const SCENE_WIDTH = SCENE_CELLS_WIDTH * CELL_SIZE;
 const SCENE_HEIGHT = SCENE_CELLS_HEIGHT * CELL_SIZE;
-const VIEWPORT_WIDTH = 590;
-const VIEWPORT_HEIGHT = 590;
+const VIEWPORT_WIDTH = window.innerWidth;
+const VIEWPORT_HEIGHT = window.innerHeight;
 const ZOOM_MIN = 0.2;
 const ZOOM_MAX = 2.0;
-const ZOOM_INTERVAL = 0.05;
+const ZOOM_INTERVAL = 0.005;
 
 
 let canvas: HTMLElement;
@@ -77,6 +77,7 @@ class Viewport {
     this.keysPressed = {};
 
     this.canvas.style.cursor = 'pointer';
+    window.addEventListener('resize', this.handleResize.bind(this));
     this.canvas.addEventListener('mouseup', this.panUp.bind(this));
     this.canvas.addEventListener('mousedown', this.panDown.bind(this));
     this.canvas.addEventListener('mousemove', this.panMove.bind(this));
@@ -94,6 +95,16 @@ class Viewport {
     });
   }
 
+  handleResize() {
+    console.log('resize');
+    this.viewportSize = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+    this.canvas.setAttribute('width', `${this.viewportSize.width}px`);
+    this.canvas.setAttribute('height', `${this.viewportSize.height}px`);
+  }
+
   update() {
     this.checkKeysPressed();
   }
@@ -105,6 +116,11 @@ class Viewport {
   handleKeyup(event) {
     if (event.keyCode === 32) {
       this.changeZoomLevel(1, this.cursorLocation.x, this.cursorLocation.y);
+    } else if (event.keyCode === 13) {
+      this.travel({
+        x: SCENE_WIDTH / 2,
+        y: SCENE_WIDTH / 2,
+      }, 100);
     }
   }
 
@@ -133,20 +149,20 @@ class Viewport {
   // the world coordinate at the center of the screen
   get center(): Coordinate {
     return {
-      x: ((this.viewportSize.width / 2) - this.offset.x) * this.zoomLevel,
-      y: ((this.viewportSize.height / 2) - this.offset.y) * this.zoomLevel,
+      x: this.toZoom((this.viewportSize.width / 2) - this.offset.x),
+      y: this.toZoom((this.viewportSize.height / 2) - this.offset.y),
     };
   }
 
   handleZoom(event) {
     const direction = event.deltaY < 0 ? 'up' : 'down';
-    console.log(direction);
+    const mag: number = Math.abs(event.deltaY);
     event.preventDefault();
     const { offsetX: x, offsetY: y } = event;
     if (direction === 'down') {
-      this.changeZoomLevel(this.zoomLevel + ZOOM_INTERVAL, x, y);
+      this.changeZoomLevel(this.zoomLevel + (mag * ZOOM_INTERVAL), x, y);
     } else {
-      this.changeZoomLevel(this.zoomLevel - ZOOM_INTERVAL, x, y);
+      this.changeZoomLevel(this.zoomLevel - (mag * ZOOM_INTERVAL), x, y);
     }
   }
 
@@ -155,8 +171,8 @@ class Viewport {
     const lastZoomLevel = this.zoomLevel;
     this.zoomLevel = zoomLevel;
     this.move(
-      x * this.zoomLevel - x * lastZoomLevel,
-      y * this.zoomLevel - y * lastZoomLevel,
+      x / this.zoomLevel - x / lastZoomLevel,
+      y / this.zoomLevel - y / lastZoomLevel,
     );
   }
 
@@ -176,33 +192,35 @@ class Viewport {
     this.offset.y += y;
   }
 
-  jump(x: number, y: number) {
+  jump(coord: Coordinate) {
     this.offset = {
-      x: -x + (this.viewportSize.width / 2) * this.zoomLevel,
-      y: -y + (this.viewportSize.height / 2) * this.zoomLevel,
+      x: -coord.x + this.fromZoom(this.viewportSize.width / 2),
+      y: -coord.y + this.fromZoom(this.viewportSize.height / 2),
     };
+    console.log('Jump to:', this.offset);
   }
 
-  travel({ x, y }: Coordinate){
+  travel({ x, y }: Coordinate, duration: number = 1000){
     console.log(`Travel to ${x}, ${y} from ${this.center.x}, ${this.center.y}`);
-    const current: Object = {
-      ...this.center,
-      z: this.zoomLevel,
-    };
+    const current: Object = this.center;
     const jump = this.jump.bind(this);
-    const changeZoomLevel = this.changeZoomLevel.bind(this);
     anime({
       targets: current,
       x,
       y,
-      z: 1,
+      duration,
       round: 1,
       easing: 'linear',
       update() {
-        jump(current.x, current.y);
-        changeZoomLevel(current.z);
+        jump(current);
       }
     })
+  }
+
+  panUp() {
+    this.isPanning = false;
+    this.panLocation = null;
+    this.canvas.style.cursor = 'pointer';
   }
 
   panDown(event: Object) {
@@ -217,8 +235,11 @@ class Viewport {
         x: (this.panLocation.x - event.offsetX) / -1,
         y: (this.panLocation.y - event.offsetY) / -1,
       }
-      this.offset.x += diff.x * this.zoomLevel;
-      this.offset.y += diff.y * this.zoomLevel;
+      this.offset.x += this.fromZoom(diff.x);
+      this.offset.y += this.fromZoom(diff.y);
+      if (this.panLocation == null) {
+        return;
+      }
       this.panLocation.x += diff.x;
       this.panLocation.y += diff.y;
     }
@@ -229,28 +250,26 @@ class Viewport {
     };
   }
 
-  panUp() {
-    this.isPanning = false;
-    this.panLocation = null;
-    this.canvas.style.cursor = 'pointer';
+  toZoom(number: number): number {
+    return number * this.zoomLevel;
   }
 
-  calculateZoom(number: number): number {
+  fromZoom(number: number): number {
     return number / this.zoomLevel;
   }
 
   worldToViewport(coord: Coordinate): Coordinate {
     return {
-      x: this.calculateZoom(this.offset.x + coord.x),
-      y: this.calculateZoom(this.offset.y + coord.y),
+      x: this.toZoom(this.offset.x + coord.x),
+      y: this.toZoom(this.offset.y + coord.y),
     };
   }
 
   // convert viewport coordinates to world coordinates
   viewportToWorld(coord: Coordinate): Coordinate {
     return {
-      x: this.calculateZoom(this.offset.x + coord.x),
-      y: this.calculateZoom(this.offset.y + coord.y),
+      x: this.toZoom(this.offset.x + coord.x),
+      y: this.toZoom(this.offset.y + coord.y),
     };
   }
 }
@@ -313,8 +332,8 @@ class Region {
           ctx.fillRect(
             rect.x,
             rect.y,
-            viewport.calculateZoom(CELL_SIZE),
-            viewport.calculateZoom(CELL_SIZE)
+            viewport.toZoom(CELL_SIZE),
+            viewport.toZoom(CELL_SIZE)
           );
         }
       }
@@ -324,7 +343,7 @@ class Region {
   }
 
   drawGuides(viewport) {
-    // // draw center of screen dot
+    // draw pan location
     // if (viewport.panLocation != null && viewport.panLocation.x !== 0 && viewport.panLocation.y !== 0) {
     //   ctx.beginPath();
     //   ctx.fillStyle = 'blue';
@@ -361,7 +380,8 @@ class World {
 
   draw() {
     this.ctx.fillStyle = 'white';
-    this.ctx.fillRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+    const { width, height } = this.viewport.viewportSize;
+    this.ctx.fillRect(0, 0, width, height);
     this.region.draw(this.viewport);
   }
 
