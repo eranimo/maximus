@@ -65,6 +65,8 @@ class Viewport {
   zoomLevel: number;
   canvas: HTMLElement;
   keysPressed: Object;
+  viewportTopLeft: Coordinate;
+  viewportBottomRight: Coordinate;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
     this.sceneSize = sceneSize;
@@ -93,6 +95,8 @@ class Viewport {
     document.addEventListener('keydown', event => {
       this.keysPressed[event.keyCode] = true;
     });
+
+    this.onMovement();
   }
 
   handleResize() {
@@ -105,7 +109,19 @@ class Viewport {
     this.canvas.setAttribute('height', `${this.viewportSize.height}px`);
   }
 
-  update() {
+  onMovement() {
+    this.viewportTopLeft = this.viewportToWorld({
+      x: 0,
+      y: 0,
+    });
+
+    this.viewportBottomRight = this.viewportToWorld({
+      x: this.viewportSize.width,
+      y: this.viewportSize.height
+    });
+  }
+
+  tick() {
     this.checkKeysPressed();
   }
 
@@ -190,6 +206,7 @@ class Viewport {
   move(x: number, y: number) {
     this.offset.x += x;
     this.offset.y += y;
+    this.onMovement();
   }
 
   jump(coord: Coordinate) {
@@ -198,6 +215,7 @@ class Viewport {
       y: -coord.y + this.fromZoom(this.viewportSize.height / 2),
     };
     console.log('Jump to:', this.offset);
+    this.onMovement();
   }
 
   travel({ x, y }: Coordinate, duration: number = 1000){
@@ -242,6 +260,8 @@ class Viewport {
       }
       this.panLocation.x += diff.x;
       this.panLocation.y += diff.y;
+
+      this.onMovement();
     }
 
     this.cursorLocation = {
@@ -268,8 +288,15 @@ class Viewport {
   // convert viewport coordinates to world coordinates
   viewportToWorld(coord: Coordinate): Coordinate {
     return {
-      x: this.toZoom(this.offset.x + coord.x),
-      y: this.toZoom(this.offset.y + coord.y),
+      x: -this.fromZoom(this.offset.x) + coord.x,
+      y: -this.fromZoom(this.offset.y) + coord.y,
+    };
+  }
+
+  getViewportRealSize(): Size {
+    return {
+      width: this.viewportSize.width / this.zoomLevel,
+      height: this.viewportSize.height / this.zoomLevel,
     };
   }
 }
@@ -338,23 +365,6 @@ class Region {
         }
       }
     }
-
-    this.drawGuides(viewport);
-  }
-
-  drawGuides(viewport) {
-    // draw pan location
-    // if (viewport.panLocation != null && viewport.panLocation.x !== 0 && viewport.panLocation.y !== 0) {
-    //   ctx.beginPath();
-    //   ctx.fillStyle = 'blue';
-    //   const location = viewport.panLocation;
-    //   if (!location) {
-    //     return;
-    //   }
-    //   const { x, y } = location;
-    //   ctx.arc(x, y, 20, 0, 2 * Math.PI);
-    //   ctx.stroke();
-    // }
   }
 }
 
@@ -383,10 +393,70 @@ class World {
     const { width, height } = this.viewport.viewportSize;
     this.ctx.fillRect(0, 0, width, height);
     this.region.draw(this.viewport);
+
+    this.drawMinimap();
+  }
+
+  drawMinimap() {
+    const { viewportSize, sceneSize, viewportTopLeft, viewportBottomRight } = this.viewport;
+    const toZoom = this.viewport.toZoom.bind(this.viewport);
+    const fromZoom = this.viewport.fromZoom.bind(this.viewport);
+    const MINIMAP_WIDTH = 200;
+    const MINIMAP_HEIGHT = 200;
+
+    const minimapOrigin = {
+      x: 0.5 + viewportSize.width - MINIMAP_WIDTH,
+      y: 0.5 + viewportSize.height - MINIMAP_HEIGHT,
+    };
+
+    // minimap frame
+    ctx.beginPath();
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'white';
+    ctx.rect(
+      minimapOrigin.x,
+      minimapOrigin.y,
+      0.5 + viewportSize.width,
+      0.5 + viewportSize.height
+    );
+    ctx.fill();
+    ctx.stroke();
+
+    // minimap board
+    for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
+      for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
+        const cell = this.region.board[x][y];
+        if (cell) {
+          ctx.beginPath();
+          ctx.fillStyle = cell.color;
+          ctx.fillRect(
+            1 + minimapOrigin.x + MINIMAP_WIDTH * 2 * (x / MINIMAP_WIDTH),
+            1 + minimapOrigin.y + MINIMAP_HEIGHT * 2 * (y / MINIMAP_HEIGHT),
+            1,
+            1,
+          );
+          ctx.fill();
+        }
+      }
+    }
+
+    // minimap frame
+    ctx.beginPath();
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 2;
+    const { width, height } = this.viewport.getViewportRealSize();
+    ctx.rect(
+      0.5 + Math.round(minimapOrigin.x + ((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH)),
+      0.5 + Math.round(minimapOrigin.y + ((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT)),
+      Math.round(MINIMAP_WIDTH * (width / sceneSize.width)),
+      Math.round(MINIMAP_HEIGHT * (height / sceneSize.height)),
+    );
+    ctx.stroke();
   }
 
   update() {
-    this.viewport.update();
+    this.viewport.tick();
   }
 
   loop() {
