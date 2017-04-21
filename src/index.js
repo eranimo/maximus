@@ -375,14 +375,50 @@ class Region {
 }
 
 class Minimap {
+  canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
   viewport: Viewport;
   board: Board;
+  isPanning: boolean;
 
-  constructor(ctx: CanvasRenderingContext2D, viewport: Viewport, board: Board) {
-    this.ctx = ctx;
+  constructor(board: Board, canvas: HTMLElement, viewport: Viewport) {
     this.viewport = viewport;
     this.board = board;
+    this.canvas = canvas;
+
+    this.isPanning = false;
+
+    // $FlowFixMe
+    this.ctx = canvas.getContext('2d');
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.translate(0.5, 0.5)
+
+    this.setupEvents();
+  }
+
+  setupEvents() {
+    this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
+    // $FlowFixMe
+    this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
+    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+  }
+
+  handleMouseDown(event) {
+    this.isPanning = true;
+    this.handleMouseMove(event);
+  }
+
+  handleMouseUp() {
+    this.isPanning = false;
+  }
+
+  handleMouseMove(event: MouseEvent) {
+    if (this.isPanning) {
+      this.viewport.jump({
+        x: Math.round((event.offsetX / MINIMAP_WIDTH) * this.viewport.sceneSize.width),
+        y: Math.round((event.offsetY / MINIMAP_HEIGHT) * this.viewport.sceneSize.height),
+      });
+    }
   }
 
   draw() {
@@ -443,8 +479,6 @@ class Minimap {
 class World {
   canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
-  minimapCanvas: HTMLElement;
-  minimapCtx: CanvasRenderingContext2D;
 
   viewport: Viewport;
   region: Region;
@@ -452,19 +486,13 @@ class World {
 
   constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
     this.canvas = main;
-    this.minimapCanvas = minimap;
 
     // $FlowFixMe
     const mainContext: CanvasRenderingContext2D = main.getContext('2d');
     mainContext.imageSmoothingEnabled = false;
     mainContext.translate(0.5, 0.5)
-    // $FlowFixMe
-    const minimapContext: CanvasRenderingContext2D = minimap.getContext('2d');
-    minimapContext.imageSmoothingEnabled = false;
-    minimapContext.translate(0.5, 0.5)
 
     this.ctx = mainContext;
-    this.minimapCtx = minimapContext;
 
 
     this.viewport = new Viewport({
@@ -477,7 +505,7 @@ class World {
     window.viewport = this.viewport;
     const board: Board = makeBoard();
     this.region = new Region(board, mainContext);
-    this.minimap = new Minimap(minimapContext, this.viewport, board);
+    this.minimap = new Minimap(board, minimap, this.viewport);
   }
 
   draw() {
