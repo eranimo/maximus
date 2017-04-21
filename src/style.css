@@ -15,6 +15,18 @@ body {
 }
 
 canvas {
-  border: 1px solid black;
   image-rendering: pixelated;
+}
+
+#gameCanvas {
+  z-index: 1;
+}
+
+
+#minimapCanvas {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  border: 1px solid black;
 }

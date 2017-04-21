@@ -28,25 +28,29 @@ const VIEWPORT_HEIGHT = window.innerHeight;
 const ZOOM_MIN = 0.2;
 const ZOOM_MAX = 2.0;
 const ZOOM_INTERVAL = 0.005;
+const MINIMAP_WIDTH = 200;
+const MINIMAP_HEIGHT = 200;
 
 
-let canvas: HTMLElement;
-let ctx: CanvasRenderingContext2D;
 window.onload = () => {
   // $FlowFixMe
-  canvas = document.getElementById('gameCanvas');
-  if (!canvas) {
+  const mainCanvas: HTMLElement = document.getElementById('gameCanvas');
+  // $FlowFixMe
+  const minimapCanvas: HTMLElement = document.getElementById('minimapCanvas');
+  if (!mainCanvas || !minimapCanvas) {
     throw new Error('Fuck flowtype');
   }
-  canvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
-  canvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
-  // $FlowFixMe
-  ctx = canvas.getContext('2d');
-  ctx.imageSmoothingEnabled = false;
-  ctx.translate(0.5, 0.5)
-  const world: World = new World(canvas, ctx);
+  mainCanvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
+  mainCanvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
+
+  minimapCanvas.setAttribute('width', `${MINIMAP_WIDTH}px`);
+  minimapCanvas.setAttribute('height', `${MINIMAP_HEIGHT}px`);
+
+  const world: World = new World({
+    main: mainCanvas,
+    minimap: minimapCanvas,
+  });
   world.loop();
-  console.log(ctx);
 }
 
 type Board = Array<Array<any>>;
@@ -303,9 +307,11 @@ class Viewport {
 
 class Region {
   board: Board;
+  ctx: CanvasRenderingContext2D;
 
-  constructor(board: Board) {
+  constructor(board: Board, ctx: CanvasRenderingContext2D) {
     this.board = board;
+    this.ctx = ctx;
 
     let cells = _.random(500);
     for (let i = 0; i < cells; i++) {
@@ -316,7 +322,7 @@ class Region {
   }
 
   draw(viewport: Viewport) {
-
+    const ctx = this.ctx;
     // grid
     for (let x = 0; x <= this.board.length; x++) {
       ctx.beginPath();
@@ -368,71 +374,49 @@ class Region {
   }
 }
 
-class World {
-  canvas: HTMLElement;
+class Minimap {
   ctx: CanvasRenderingContext2D;
   viewport: Viewport;
-  region: Region;
+  board: Board;
 
-  constructor(canvas: HTMLElement, ctx: CanvasRenderingContext2D) {
-    this.viewport = new Viewport({
-      width: SCENE_WIDTH,
-      height: SCENE_HEIGHT
-    }, {
-      width: VIEWPORT_WIDTH,
-      height: VIEWPORT_HEIGHT,
-    }, canvas);
-    window.viewport = this.viewport;
-    this.canvas = canvas;
+  constructor(ctx: CanvasRenderingContext2D, viewport: Viewport, board: Board) {
     this.ctx = ctx;
-    this.region = new Region(makeBoard(), this.viewport);
+    this.viewport = viewport;
+    this.board = board;
   }
 
   draw() {
-    this.ctx.fillStyle = 'white';
-    const { width, height } = this.viewport.viewportSize;
-    this.ctx.fillRect(0, 0, width, height);
-    this.region.draw(this.viewport);
-
-    this.drawMinimap();
-  }
-
-  drawMinimap() {
+    const ctx = this.ctx;
     const { viewportSize, sceneSize, viewportTopLeft, viewportBottomRight } = this.viewport;
     const toZoom = this.viewport.toZoom.bind(this.viewport);
     const fromZoom = this.viewport.fromZoom.bind(this.viewport);
-    const MINIMAP_WIDTH = 200;
-    const MINIMAP_HEIGHT = 200;
 
     const minimapOrigin = {
       x: 0.5 + viewportSize.width - MINIMAP_WIDTH,
       y: 0.5 + viewportSize.height - MINIMAP_HEIGHT,
     };
 
-    // minimap frame
+    // minimap background
     ctx.beginPath();
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = 2;
     ctx.fillStyle = 'white';
     ctx.rect(
-      minimapOrigin.x,
-      minimapOrigin.y,
-      0.5 + viewportSize.width,
-      0.5 + viewportSize.height
+      0,
+      0,
+      MINIMAP_WIDTH,
+      MINIMAP_HEIGHT,
     );
     ctx.fill();
-    ctx.stroke();
 
     // minimap board
     for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
       for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-        const cell = this.region.board[x][y];
+        const cell = this.board[x][y];
         if (cell) {
           ctx.beginPath();
           ctx.fillStyle = cell.color;
           ctx.fillRect(
-            1 + minimapOrigin.x + MINIMAP_WIDTH * 2 * (x / MINIMAP_WIDTH),
-            1 + minimapOrigin.y + MINIMAP_HEIGHT * 2 * (y / MINIMAP_HEIGHT),
+            1 + MINIMAP_WIDTH * 2 * (x / MINIMAP_WIDTH),
+            1 + MINIMAP_HEIGHT * 2 * (y / MINIMAP_HEIGHT),
             1,
             1,
           );
@@ -447,12 +431,62 @@ class World {
     ctx.lineWidth = 2;
     const { width, height } = this.viewport.getViewportRealSize();
     ctx.rect(
-      0.5 + Math.round(minimapOrigin.x + ((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH)),
-      0.5 + Math.round(minimapOrigin.y + ((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT)),
+      0.5 + Math.round((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH),
+      0.5 + Math.round((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT),
       Math.round(MINIMAP_WIDTH * (width / sceneSize.width)),
       Math.round(MINIMAP_HEIGHT * (height / sceneSize.height)),
     );
     ctx.stroke();
+  }
+}
+
+class World {
+  canvas: HTMLElement;
+  ctx: CanvasRenderingContext2D;
+  minimapCanvas: HTMLElement;
+  minimapCtx: CanvasRenderingContext2D;
+
+  viewport: Viewport;
+  region: Region;
+  minimap: Minimap;
+
+  constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
+    this.canvas = main;
+    this.minimapCanvas = minimap;
+
+    // $FlowFixMe
+    const mainContext: CanvasRenderingContext2D = main.getContext('2d');
+    mainContext.imageSmoothingEnabled = false;
+    mainContext.translate(0.5, 0.5)
+    // $FlowFixMe
+    const minimapContext: CanvasRenderingContext2D = minimap.getContext('2d');
+    minimapContext.imageSmoothingEnabled = false;
+    minimapContext.translate(0.5, 0.5)
+
+    this.ctx = mainContext;
+    this.minimapCtx = minimapContext;
+
+
+    this.viewport = new Viewport({
+      width: SCENE_WIDTH,
+      height: SCENE_HEIGHT
+    }, {
+      width: VIEWPORT_WIDTH,
+      height: VIEWPORT_HEIGHT,
+    }, this.canvas);
+    window.viewport = this.viewport;
+    const board: Board = makeBoard();
+    this.region = new Region(board, mainContext);
+    this.minimap = new Minimap(minimapContext, this.viewport, board);
+  }
+
+  draw() {
+    this.ctx.fillStyle = 'white';
+    const { width, height } = this.viewport.viewportSize;
+    this.ctx.fillRect(0, 0, width, height);
+    this.region.draw(this.viewport);
+
+    this.minimap.draw();
   }
 
   update() {
