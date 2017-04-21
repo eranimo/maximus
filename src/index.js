@@ -18,9 +18,9 @@ type Size = {
   height: number
 };
 
-const SCENE_CELLS_WIDTH = 100;
-const SCENE_CELLS_HEIGHT = 100;
-const CELL_SIZE = 25;
+const SCENE_CELLS_WIDTH = 1000;
+const SCENE_CELLS_HEIGHT = 1000;
+const CELL_SIZE = 20;
 const SCENE_WIDTH = SCENE_CELLS_WIDTH * CELL_SIZE;
 const SCENE_HEIGHT = SCENE_CELLS_HEIGHT * CELL_SIZE;
 const VIEWPORT_WIDTH = window.innerWidth;
@@ -56,6 +56,26 @@ window.onload = () => {
 type Board = Array<Array<any>>;
 function makeBoard(): Board {
   return _.times(SCENE_CELLS_WIDTH, () => _.times(SCENE_CELLS_HEIGHT, () => null));
+}
+
+function cleanBoard(board: Board): Board {
+  for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
+    for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
+      board[x][y] = null;
+    }
+  }
+  return board;
+}
+
+function randomizeBoard(board: Board): Board {
+  let cells = _.random(100, 500);
+  for (let i = 0; i < cells; i++) {
+    const x = _.random(0, SCENE_CELLS_WIDTH - 1);
+    const y = _.random(0, SCENE_CELLS_HEIGHT - 1);
+    board[x][y] = { color: 'blue' };
+  }
+
+  return board;
 }
 
 
@@ -306,56 +326,61 @@ class Viewport {
 }
 
 class Region {
-  board: Board;
+  world: World;
   ctx: CanvasRenderingContext2D;
+  canvas: HTMLElement;
+  viewport: Viewport;
 
-  constructor(board: Board, ctx: CanvasRenderingContext2D) {
-    this.board = board;
-    this.ctx = ctx;
+  constructor(world: World, canvas: HTMLElement, viewport: Viewport) {
+    this.world = world;
+    this.canvas = canvas;
+    this.viewport = viewport;
 
-    let cells = _.random(500);
-    for (let i = 0; i < cells; i++) {
-      const x = _.random(0, SCENE_CELLS_WIDTH - 1);
-      const y = _.random(0, SCENE_CELLS_HEIGHT - 1);
-      this.board[x][y] = { color: 'blue' };
-    }
+    // $FlowFixMe
+    this.ctx = canvas.getContext('2d');
+    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.translate(0.5, 0.5)
   }
 
-  draw(viewport: Viewport) {
+  draw() {
     const ctx = this.ctx;
+    const viewport = this.viewport;
+
+    this.ctx.fillStyle = 'white';
+    const { width, height } = this.viewport.viewportSize;
+    this.ctx.fillRect(0, 0, width, height);
+
+    ctx.strokeStyle = 'gray';
+    ctx.lineWidth = viewport.toZoom(0.5);
     // grid
-    for (let x = 0; x <= this.board.length; x++) {
+    for (let x = 0; x <= this.world.board.length; x++) {
       ctx.beginPath();
-      ctx.strokeStyle = 'gray';
-      ctx.lineWidth = 1;
       const lineFrom: Coordinate = viewport.worldToViewport({ x: x * CELL_SIZE, y: 0 });
       ctx.moveTo(lineFrom.x, lineFrom.y);
       const lineTo: Coordinate = viewport.worldToViewport({
         x: x * CELL_SIZE,
         y: SCENE_CELLS_WIDTH * CELL_SIZE,
       });
-      ctx.lineTo(lineTo.x, lineTo.y);
+      ctx.lineTo(0.5 + lineTo.x, 0.5 + lineTo.y);
       ctx.stroke();
     }
 
-    for (let y = 0; y <= this.board.length; y++) {
+    for (let y = 0; y <= this.world.board.length; y++) {
       ctx.beginPath();
-      ctx.strokeStyle = 'gray';
-      ctx.lineWidth = 1;
       const lineFrom: Coordinate = viewport.worldToViewport({ x: 0, y: y * CELL_SIZE });
       ctx.moveTo(lineFrom.x, lineFrom.y);
       const lineTo: Coordinate = viewport.worldToViewport({
         x: SCENE_CELLS_WIDTH * CELL_SIZE,
         y: y * CELL_SIZE
       });
-      ctx.lineTo(lineTo.x, lineTo.y);
+      ctx.lineTo(0.5 + lineTo.x, 0.5 + lineTo.y);
       ctx.stroke();
     }
 
     // cells
     for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
       for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-        const cell = this.board[x][y];
+        const cell = this.world.board[x][y];
         if (cell) {
           ctx.fillStyle = cell.color;
           const rect: Coordinate = viewport.worldToViewport({
@@ -378,12 +403,12 @@ class Minimap {
   canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
   viewport: Viewport;
-  board: Board;
+  world: World;
   isPanning: boolean;
 
-  constructor(board: Board, canvas: HTMLElement, viewport: Viewport) {
+  constructor(world: World, canvas: HTMLElement, viewport: Viewport) {
     this.viewport = viewport;
-    this.board = board;
+    this.world = world;
     this.canvas = canvas;
 
     this.isPanning = false;
@@ -446,7 +471,7 @@ class Minimap {
     // minimap board
     for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
       for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-        const cell = this.board[x][y];
+        const cell = this.world.board[x][y];
         if (cell) {
           ctx.beginPath();
           ctx.fillStyle = cell.color;
@@ -483,42 +508,37 @@ class World {
   viewport: Viewport;
   region: Region;
   minimap: Minimap;
+  tick: number;
+  board: Board;
 
   constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
-    this.canvas = main;
-
-    // $FlowFixMe
-    const mainContext: CanvasRenderingContext2D = main.getContext('2d');
-    mainContext.imageSmoothingEnabled = false;
-    mainContext.translate(0.5, 0.5)
-
-    this.ctx = mainContext;
-
-
     this.viewport = new Viewport({
       width: SCENE_WIDTH,
       height: SCENE_HEIGHT
     }, {
       width: VIEWPORT_WIDTH,
       height: VIEWPORT_HEIGHT,
-    }, this.canvas);
+    }, main);
+    this.tick = 0;
     window.viewport = this.viewport;
-    const board: Board = makeBoard();
-    this.region = new Region(board, mainContext);
-    this.minimap = new Minimap(board, minimap, this.viewport);
+    this.board = makeBoard();
+    this.region = new Region(this, main, this.viewport);
+    this.minimap = new Minimap(this, minimap, this.viewport);
   }
 
   draw() {
-    this.ctx.fillStyle = 'white';
-    const { width, height } = this.viewport.viewportSize;
-    this.ctx.fillRect(0, 0, width, height);
-    this.region.draw(this.viewport);
-
+    this.region.draw();
     this.minimap.draw();
   }
 
   update() {
     this.viewport.tick();
+
+    if (this.tick % 120 === 0) {
+      this.board = randomizeBoard(cleanBoard(this.board));
+      console.log('new board');
+    }
+    this.tick++;
   }
 
   loop() {
