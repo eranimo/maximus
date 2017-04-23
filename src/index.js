@@ -70,7 +70,7 @@ function cleanBoard(board: Board): Board {
 }
 
 function randomizeBoard(board: Board): Board {
-  let cells = _.random(100, 500);
+  let cells = _.random(5000, 6000);
   for (let i = 0; i < cells; i++) {
     const x = _.random(0, SCENE_CELLS_WIDTH - 1);
     const y = _.random(0, SCENE_CELLS_HEIGHT - 1);
@@ -319,6 +319,7 @@ class Viewport {
     };
   }
 
+  // is viewport coordinate in viewport
   isInViewport(coord: Coordinate): boolean {
     const { width, height } = this.viewportSize;
     return coord.x >= 0 && coord.y >= 0 &&
@@ -340,8 +341,8 @@ class Viewport {
     };
   }
 
-  // returns boolean if a world point is in the viewport
-  pointInViewport(point: Point) {
+  // returns boolean if a viewport point is in the viewport
+  isWorldPointVisible(point: Point) {
     point = this.viewportToWorld(point);
     return this.topLeft.x >= point.x && point.x <= this.bottomRight.x ||
            this.topLeft.y >= point.y && point.y <= this.bottomRight.y;
@@ -391,10 +392,13 @@ class Region {
         SCENE_CELLS_WIDTH * CELL_SIZE,
       );
 
-      this.drawLine(
+      const intersect = this.calculateLine(
         pointFrom,
         pointTo,
       );
+      if (intersect) {
+        this.drawGridLine(intersect.from, intersect.to);
+      }
     }
 
     for (let y = 0; y <= this.world.board.length; y++) {
@@ -404,31 +408,17 @@ class Region {
         y * CELL_SIZE
       );
 
-      this.drawLine(
+      const intersect = this.calculateLine(
         pointFrom,
         pointTo,
       );
+      if (intersect) {
+        this.drawGridLine(intersect.from, intersect.to);
+      }
     }
 
     // cells
-    for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
-      for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-        const cell = this.world.board[x][y];
-        if (cell) {
-          ctx.fillStyle = cell.color;
-          const rect: Coordinate = viewport.worldToViewport({
-            x: x * CELL_SIZE,
-            y: y * CELL_SIZE
-          });
-          ctx.fillRect(
-            rect.x,
-            rect.y,
-            viewport.toZoom(CELL_SIZE),
-            viewport.toZoom(CELL_SIZE)
-          );
-        }
-      }
-    }
+    this.drawCells();
 
     const cursor = viewport.cursorLocation;
     ctx.font = '20px sans-serif';
@@ -438,12 +428,57 @@ class Region {
     ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
     ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
     ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
-
   }
 
-  // draw a line in world coordinates
-  // will only render the part on the viewport
-  drawLine(from: Point, to: Point) {
+  drawCells() {
+    for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
+      for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
+        const cell = this.world.board[x][y];
+        if (cell) {
+          this.ctx.fillStyle = cell.color;
+
+          const intersect = this.calculateRect(
+            new Point(x * CELL_SIZE, y * CELL_SIZE),
+            CELL_SIZE,
+            CELL_SIZE,
+          );
+          if (intersect) {
+            this.ctx.fillRect(
+              intersect.topLeft.x,
+              intersect.topLeft.y,
+              intersect.width,
+              intersect.height,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // calculate a rectangle in world coordinates
+  // will return the top left and bottom right points in the viewport
+  calculateRect(loc: Point, width: number, height: number): ?Object {
+    const loc2 = new Point(loc.x + width, loc.y + height);
+    const loc3 = new Point(loc.x, loc.y + height);
+    const loc4 = new Point(loc.x + width, loc.y);
+    if (
+      this.viewport.isInViewport(this.viewport.worldToViewport(loc)) ||
+      this.viewport.isInViewport(this.viewport.worldToViewport(loc2)) ||
+      this.viewport.isInViewport(this.viewport.worldToViewport(loc3)) ||
+      this.viewport.isInViewport(this.viewport.worldToViewport(loc4))
+    ) {
+      const topLeft = this.viewport.worldToViewport(loc);
+      const bottomRight = this.viewport.worldToViewport(loc2);
+      const newWidth = bottomRight.x - topLeft.x;
+      const newHeight = bottomRight.y - topLeft.y;
+      return { topLeft, width: newWidth, height: newHeight };
+    }
+    return null;
+  }
+
+  // calculate a line in world coordinates
+  // will return the end points of the line in the viewport
+  calculateLine(from: Point, to: Point) {
     let intersect = Intersection.intersectLineRectangle(
       from,
       to,
@@ -457,12 +492,12 @@ class Region {
           to: intersect.points[1],
         };
       } else if (intersect.points.length === 1) {
-        if (this.viewport.pointInViewport(from)) {
+        if (this.viewport.isWorldPointVisible(from)) {
           intersect = {
             from: from,
             to: intersect.points[0],
           };
-        } else if (this.viewport.pointInViewport(to)) {
+        } else if (this.viewport.isWorldPointVisible(to)) {
           intersect = {
             from: to,
             to: intersect.points[0],
@@ -475,20 +510,24 @@ class Region {
         return;
       }
 
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = 'black';
-      this.ctx.strokeStyle = 'gray';
-      this.ctx.lineWidth = this.viewport.toZoom(0.5);
-      this.ctx.moveTo(
-        0.5 + Math.round(this.viewport.worldToViewport(intersect.to).x),
-        0.5 + Math.round(this.viewport.worldToViewport(intersect.to).y),
-      );
-      this.ctx.lineTo(
-        0.5 + Math.round(this.viewport.worldToViewport(intersect.from).x),
-        0.5 + Math.round(this.viewport.worldToViewport(intersect.from).y),
-      );
-      this.ctx.stroke();
+      return intersect;
     }
+  }
+
+  drawGridLine(from: Point, to: Point) {
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = 'black';
+    this.ctx.strokeStyle = 'gray';
+    this.ctx.lineWidth = this.viewport.toZoom(0.5);
+    this.ctx.moveTo(
+      0.5 + Math.round(this.viewport.worldToViewport(to).x),
+      0.5 + Math.round(this.viewport.worldToViewport(to).y),
+    );
+    this.ctx.lineTo(
+      0.5 + Math.round(this.viewport.worldToViewport(from).x),
+      0.5 + Math.round(this.viewport.worldToViewport(from).y),
+    );
+    this.ctx.stroke();
   }
 }
 
@@ -572,8 +611,8 @@ class Minimap {
           ctx.beginPath();
           ctx.fillStyle = cell.color;
           ctx.fillRect(
-            1 + MINIMAP_WIDTH * 2 * (x / MINIMAP_WIDTH),
-            1 + MINIMAP_HEIGHT * 2 * (y / MINIMAP_HEIGHT),
+            0.5 + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
+            0.5 + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
             1,
             1,
           );
@@ -585,11 +624,11 @@ class Minimap {
     // minimap frame
     ctx.beginPath();
     ctx.strokeStyle = 'red';
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     const { width, height } = this.viewport.getViewportRealSize();
     ctx.rect(
-      0.5 + Math.round((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH),
-      0.5 + Math.round((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT),
+      1.0 + Math.round((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH),
+      1.0 + Math.round((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT),
       Math.round(MINIMAP_WIDTH * (width / sceneSize.width)),
       Math.round(MINIMAP_HEIGHT * (height / sceneSize.height)),
     );
@@ -617,7 +656,7 @@ class World {
     }, main);
     this.tick = 0;
     window.viewport = this.viewport;
-    this.board = makeBoard();
+    this.board = randomizeBoard(makeBoard());
     this.region = new Region(this, main, this.viewport);
     this.minimap = new Minimap(this, minimap, this.viewport);
   }
@@ -630,10 +669,10 @@ class World {
   update() {
     this.viewport.tick();
 
-    if (this.tick % 120 === 0) {
-      this.board = randomizeBoard(cleanBoard(this.board));
-      console.log('new board');
-    }
+    // if (this.tick % 120099 === 0) {
+    //   this.board = randomizeBoard(cleanBoard(this.board));
+    //   console.log('new board');
+    // }
     this.tick++;
   }
 
