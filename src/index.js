@@ -93,7 +93,7 @@ class Viewport {
   keysPressed: Object;
   topLeft: Coordinate;
   bottomRight: Coordinate;
-  cellHover: Coordinate;
+  cellHover: ?Coordinate;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
     this.sceneSize = sceneSize;
@@ -149,8 +149,8 @@ class Viewport {
   }
 
   tick() {
-    this.checkKeysPressed();
     this.checkBoardHover();
+    this.checkKeysPressed();
   }
 
   isKeyPressed(keyCode: number): boolean {
@@ -194,6 +194,9 @@ class Viewport {
     if (this.isKeyPressed(39) || this.isKeyPressed(68)) { // right
       this.move(-delta, 0);
       didSomething = true;
+    }
+    if (didSomething) {
+      this.cellHover = null;
     }
     return didSomething;
   }
@@ -438,13 +441,22 @@ class Region {
     ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
     ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
     ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
-    ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
+    if (viewport.cellHover){
+      ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
+    }
 
 
     // draw hover cell
+    this.drawCursor();
+  }
+
+  drawCursor() {
     this.ctx.strokeStyle = 'black';
     this.ctx.lineWidth = this.viewport.toZoom(1);
     const cellSize = this.viewport.toZoom(CELL_SIZE);
+    if (!this.viewport.cellHover) {
+      return;
+    }
     const cellHoverViewport = this.viewport.worldToViewport(new Point(
       this.viewport.cellHover.x * CELL_SIZE,
       this.viewport.cellHover.y * CELL_SIZE,
