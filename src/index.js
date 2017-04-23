@@ -20,8 +20,8 @@ type Size = {
   height: number
 };
 
-const SCENE_CELLS_WIDTH = 1000;
-const SCENE_CELLS_HEIGHT = 1000;
+const SCENE_CELLS_WIDTH = 100;
+const SCENE_CELLS_HEIGHT = 100;
 const CELL_SIZE = 20;
 const SCENE_WIDTH = SCENE_CELLS_WIDTH * CELL_SIZE;
 const SCENE_HEIGHT = SCENE_CELLS_HEIGHT * CELL_SIZE;
@@ -70,7 +70,7 @@ function cleanBoard(board: Board): Board {
 }
 
 function randomizeBoard(board: Board): Board {
-  let cells = _.random(5000, 6000);
+  let cells = _.random(50, 200);
   for (let i = 0; i < cells; i++) {
     const x = _.random(0, SCENE_CELLS_WIDTH - 1);
     const y = _.random(0, SCENE_CELLS_HEIGHT - 1);
@@ -110,7 +110,7 @@ class Viewport {
     this.canvas.addEventListener('mouseup', this.panUp.bind(this));
     this.canvas.addEventListener('mousedown', this.panDown.bind(this));
     this.canvas.addEventListener('mousemove', this.panMove.bind(this));
-    this.canvas.addEventListener('mouseout', this.panUp.bind(this));
+    this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
     // $FlowFixMe
     this.canvas.addEventListener('wheel', this.handleZoom.bind(this));
     // $FlowFixMe
@@ -124,6 +124,12 @@ class Viewport {
     });
 
     this.onMovement();
+  }
+
+  handleMouseOut(event: MouseEvent) {
+    console.log('mouse out');
+    this.cellHover = null;
+    this.panUp(event);
   }
 
   handleResize() {
@@ -174,6 +180,10 @@ class Viewport {
       x: Math.floor(worldCursor.x / CELL_SIZE),
       y: Math.floor(worldCursor.y / CELL_SIZE),
     };
+    if (this.cellHover.x < 0 || this.cellHover.x > SCENE_CELLS_WIDTH ||
+        this.cellHover.y < 0 || this.cellHover.y > SCENE_CELLS_WIDTH) {
+      this.cellHover = null;
+    }
   }
 
   checkKeysPressed(): boolean {
@@ -405,7 +415,7 @@ class Region {
         SCENE_CELLS_WIDTH * CELL_SIZE,
       );
 
-      const intersect = this.calculateLine(
+      const intersect = this.calculateGridLine(
         pointFrom,
         pointTo,
       );
@@ -421,7 +431,7 @@ class Region {
         y * CELL_SIZE
       );
 
-      const intersect = this.calculateLine(
+      const intersect = this.calculateGridLine(
         pointFrom,
         pointTo,
       );
@@ -451,6 +461,7 @@ class Region {
   }
 
   drawCursor() {
+    this.ctx.beginPath();
     this.ctx.strokeStyle = 'black';
     this.ctx.lineWidth = this.viewport.toZoom(1);
     const cellSize = this.viewport.toZoom(CELL_SIZE);
@@ -517,54 +528,32 @@ class Region {
   }
 
   // calculate a line in world coordinates
-  // will return the end points of the line in the viewport
-  calculateLine(from: Point, to: Point) {
-    let intersect = Intersection.intersectLineRectangle(
-      from,
-      to,
-      this.boardRect.topLeft,
-      this.boardRect.bottomRight,
+  // will return the end points of the line in viewport coordinates
+  calculateGridLine(from: Point, to: Point) {
+    let newFrom = new Point(
+      _.clamp(from.x, 0, this.viewport.sceneSize.width),
+      _.clamp(from.y, 0, this.viewport.sceneSize.height),
     );
-    if (intersect) {
-      if (intersect.points.length >= 2) {
-        intersect = {
-          from: intersect.points[0],
-          to: intersect.points[1],
-        };
-      } else if (intersect.points.length === 1) {
-        if (this.viewport.isWorldPointVisible(from)) {
-          intersect = {
-            from: from,
-            to: intersect.points[0],
-          };
-        } else if (this.viewport.isWorldPointVisible(to)) {
-          intersect = {
-            from: to,
-            to: intersect.points[0],
-          };
-        } else {
-          throw new Error('No lines should be drawn outside of the viewport');
-        }
-      } else {
-        // if we're completely outside of the viewport, do nothing
-        return;
-      }
-
-      return intersect;
-    }
+    let newTo = new Point(
+      _.clamp(to.x, 0, this.viewport.sceneSize.width),
+      _.clamp(to.y, 0, this.viewport.sceneSize.height),
+    );
+    newFrom = this.viewport.worldToViewport(newFrom);
+    newTo = this.viewport.worldToViewport(newTo);
+    return { from: newFrom, to: newTo };
   }
 
   drawGridLine(from: Point, to: Point) {
     this.ctx.beginPath();
-    this.ctx.strokeStyle = 'gray';
+    this.ctx.strokeStyle = 'rgba(150, 150, 150, 1)';
     this.ctx.lineWidth = this.viewport.toZoom(1);
     this.ctx.moveTo(
-      0 + Math.round(this.viewport.worldToViewport(to).x),
-      0 + Math.round(this.viewport.worldToViewport(to).y),
+      0 + Math.round(to.x),
+      0 + Math.round(to.y),
     );
     this.ctx.lineTo(
-      0 + Math.round(this.viewport.worldToViewport(from).x),
-      0 + Math.round(this.viewport.worldToViewport(from).y),
+      0 + Math.round(from.x),
+      0 + Math.round(from.y),
     );
     this.ctx.stroke();
   }
