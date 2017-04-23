@@ -595,6 +595,7 @@ class Minimap {
 
   setupEvents() {
     this.canvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
+    this.canvas.addEventListener('mouseout', this.handleMouseUp.bind(this));
     // $FlowFixMe
     this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
     this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
