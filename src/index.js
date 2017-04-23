@@ -1,4 +1,6 @@
 // @flow
+import Point from './point';
+import Intersection from './intersection';
 import anime from 'animejs';
 import './style.css';
 import _ from 'lodash';
@@ -89,8 +91,8 @@ class Viewport {
   zoomLevel: number;
   canvas: HTMLElement;
   keysPressed: Object;
-  viewportTopLeft: Coordinate;
-  viewportBottomRight: Coordinate;
+  topLeft: Coordinate;
+  bottomRight: Coordinate;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
     this.sceneSize = sceneSize;
@@ -134,12 +136,12 @@ class Viewport {
   }
 
   onMovement() {
-    this.viewportTopLeft = this.viewportToWorld({
+    this.topLeft = this.viewportToWorld({
       x: 0,
       y: 0,
     });
 
-    this.viewportBottomRight = this.viewportToWorld({
+    this.bottomRight = this.viewportToWorld({
       x: this.viewportSize.width,
       y: this.viewportSize.height
     });
@@ -312,8 +314,22 @@ class Viewport {
   // convert viewport coordinates to world coordinates
   viewportToWorld(coord: Coordinate): Coordinate {
     return {
-      x: -this.fromZoom(this.offset.x) + coord.x,
-      y: -this.fromZoom(this.offset.y) + coord.y,
+      x: this.fromZoom(coord.x) - this.offset.x,
+      y: this.fromZoom(coord.y) - this.offset.y,
+    };
+  }
+
+  isInViewport(coord: Coordinate): boolean {
+    const { width, height } = this.viewportSize;
+    return coord.x >= 0 && coord.y >= 0 &&
+           coord.x <= width && coord.y <= height;
+  }
+
+  // TODO: make this work
+  clampViewport(coord: Coordinate): Coordinate {
+    return {
+      x: _.clamp(coord.x, 0, this.viewportSize.width),
+      y: _.clamp(coord.y, 0, this.viewportSize.height),
     };
   }
 
@@ -323,6 +339,13 @@ class Viewport {
       height: this.viewportSize.height / this.zoomLevel,
     };
   }
+
+  // returns boolean if a world point is in the viewport
+  pointInViewport(point: Point) {
+    point = this.viewportToWorld(point);
+    return this.topLeft.x >= point.x && point.x <= this.bottomRight.x ||
+           this.topLeft.y >= point.y && point.y <= this.bottomRight.y;
+  }
 }
 
 class Region {
@@ -330,6 +353,7 @@ class Region {
   ctx: CanvasRenderingContext2D;
   canvas: HTMLElement;
   viewport: Viewport;
+  boardRect: Object;
 
   constructor(world: World, canvas: HTMLElement, viewport: Viewport) {
     this.world = world;
@@ -340,6 +364,14 @@ class Region {
     this.ctx = canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.translate(0.5, 0.5)
+
+  }
+
+  get boardRect() {
+    return {
+      topLeft: new Point(this.viewport.topLeft.x, this.viewport.topLeft.y),
+      bottomRight: new Point(this.viewport.bottomRight.x, this.viewport.bottomRight.y),
+    };
   }
 
   draw() {
@@ -350,31 +382,32 @@ class Region {
     const { width, height } = this.viewport.viewportSize;
     this.ctx.fillRect(0, 0, width, height);
 
-    ctx.strokeStyle = 'gray';
-    ctx.lineWidth = viewport.toZoom(0.5);
+
     // grid
     for (let x = 0; x <= this.world.board.length; x++) {
-      ctx.beginPath();
-      const lineFrom: Coordinate = viewport.worldToViewport({ x: x * CELL_SIZE, y: 0 });
-      ctx.moveTo(lineFrom.x, lineFrom.y);
-      const lineTo: Coordinate = viewport.worldToViewport({
-        x: x * CELL_SIZE,
-        y: SCENE_CELLS_WIDTH * CELL_SIZE,
-      });
-      ctx.lineTo(0.5 + lineTo.x, 0.5 + lineTo.y);
-      ctx.stroke();
+      let pointFrom: Point = new Point(x * CELL_SIZE, 0);
+      let pointTo: Point = new Point(
+        x * CELL_SIZE,
+        SCENE_CELLS_WIDTH * CELL_SIZE,
+      );
+
+      this.drawLine(
+        pointFrom,
+        pointTo,
+      );
     }
 
     for (let y = 0; y <= this.world.board.length; y++) {
-      ctx.beginPath();
-      const lineFrom: Coordinate = viewport.worldToViewport({ x: 0, y: y * CELL_SIZE });
-      ctx.moveTo(lineFrom.x, lineFrom.y);
-      const lineTo: Coordinate = viewport.worldToViewport({
-        x: SCENE_CELLS_WIDTH * CELL_SIZE,
-        y: y * CELL_SIZE
-      });
-      ctx.lineTo(0.5 + lineTo.x, 0.5 + lineTo.y);
-      ctx.stroke();
+      let pointFrom: Point = new Point(0, y * CELL_SIZE);
+      let pointTo: Point = new Point(
+        SCENE_CELLS_WIDTH * CELL_SIZE,
+        y * CELL_SIZE
+      );
+
+      this.drawLine(
+        pointFrom,
+        pointTo,
+      );
     }
 
     // cells
@@ -395,6 +428,66 @@ class Region {
           );
         }
       }
+    }
+
+    const cursor = viewport.cursorLocation;
+    ctx.font = '20px sans-serif';
+    ctx.fillStyle = '#333';
+    ctx.fillText(`Cursor: (${cursor.x}, ${cursor.y})`, 0, 20);
+    const cursorWorld = viewport.viewportToWorld(viewport.cursorLocation);
+    ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
+    ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
+    ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
+
+  }
+
+  // draw a line in world coordinates
+  // will only render the part on the viewport
+  drawLine(from: Point, to: Point) {
+    let intersect = Intersection.intersectLineRectangle(
+      from,
+      to,
+      this.boardRect.topLeft,
+      this.boardRect.bottomRight,
+    );
+    if (intersect) {
+      if (intersect.points.length >= 2) {
+        intersect = {
+          from: intersect.points[0],
+          to: intersect.points[1],
+        };
+      } else if (intersect.points.length === 1) {
+        if (this.viewport.pointInViewport(from)) {
+          intersect = {
+            from: from,
+            to: intersect.points[0],
+          };
+        } else if (this.viewport.pointInViewport(to)) {
+          intersect = {
+            from: to,
+            to: intersect.points[0],
+          };
+        } else {
+          throw new Error('No lines should be drawn outside of the viewport');
+        }
+      } else {
+        // if we're completely outside of the viewport, do nothing
+        return;
+      }
+
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = 'black';
+      this.ctx.strokeStyle = 'gray';
+      this.ctx.lineWidth = this.viewport.toZoom(0.5);
+      this.ctx.moveTo(
+        0.5 + Math.round(this.viewport.worldToViewport(intersect.to).x),
+        0.5 + Math.round(this.viewport.worldToViewport(intersect.to).y),
+      );
+      this.ctx.lineTo(
+        0.5 + Math.round(this.viewport.worldToViewport(intersect.from).x),
+        0.5 + Math.round(this.viewport.worldToViewport(intersect.from).y),
+      );
+      this.ctx.stroke();
     }
   }
 }
@@ -419,6 +512,7 @@ class Minimap {
     this.ctx.translate(0.5, 0.5)
 
     this.setupEvents();
+    this.canvas.style.cursor = 'crosshair';
   }
 
   setupEvents() {
@@ -430,11 +524,13 @@ class Minimap {
 
   handleMouseDown(event) {
     this.isPanning = true;
+    this.canvas.style.cursor = 'move';
     this.handleMouseMove(event);
   }
 
   handleMouseUp() {
     this.isPanning = false;
+    this.canvas.style.cursor = 'crosshair';
   }
 
   handleMouseMove(event: MouseEvent) {
@@ -448,7 +544,7 @@ class Minimap {
 
   draw() {
     const ctx = this.ctx;
-    const { viewportSize, sceneSize, viewportTopLeft, viewportBottomRight } = this.viewport;
+    const { viewportSize, sceneSize } = this.viewport;
     const toZoom = this.viewport.toZoom.bind(this.viewport);
     const fromZoom = this.viewport.fromZoom.bind(this.viewport);
 
