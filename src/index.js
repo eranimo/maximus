@@ -167,7 +167,7 @@ class Viewport {
   }
 
   checkKeysPressed(): boolean {
-    const delta = 15;
+    const delta = this.fromZoom(15);
     let didSomething: boolean = false;
     if (this.isKeyPressed(38) || this.isKeyPressed(87)) { // up
       this.move(0, delta);
