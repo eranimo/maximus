@@ -93,6 +93,7 @@ class Viewport {
   keysPressed: Object;
   topLeft: Coordinate;
   bottomRight: Coordinate;
+  cellHover: Coordinate;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
     this.sceneSize = sceneSize;
@@ -149,6 +150,7 @@ class Viewport {
 
   tick() {
     this.checkKeysPressed();
+    this.checkBoardHover();
   }
 
   isKeyPressed(keyCode: number): boolean {
@@ -164,6 +166,14 @@ class Viewport {
         y: SCENE_WIDTH / 2,
       }, 100);
     }
+  }
+
+  checkBoardHover() {
+    const worldCursor = this.viewportToWorld(this.cursorLocation);
+    this.cellHover = {
+      x: Math.floor(worldCursor.x / CELL_SIZE),
+      y: Math.floor(worldCursor.y / CELL_SIZE),
+    };
   }
 
   checkKeysPressed(): boolean {
@@ -428,6 +438,24 @@ class Region {
     ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
     ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
     ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
+    ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
+
+
+    // draw hover cell
+    this.ctx.strokeStyle = 'black';
+    this.ctx.lineWidth = this.viewport.toZoom(1);
+    const cellSize = this.viewport.toZoom(CELL_SIZE);
+    const cellHoverViewport = this.viewport.worldToViewport(new Point(
+      this.viewport.cellHover.x * CELL_SIZE,
+      this.viewport.cellHover.y * CELL_SIZE,
+    ));
+    this.ctx.rect(
+      cellHoverViewport.x,
+      cellHoverViewport.y,
+      cellSize,
+      cellSize,
+    );
+    this.ctx.stroke();
   }
 
   drawCells() {
@@ -516,16 +544,15 @@ class Region {
 
   drawGridLine(from: Point, to: Point) {
     this.ctx.beginPath();
-    this.ctx.strokeStyle = 'black';
     this.ctx.strokeStyle = 'gray';
-    this.ctx.lineWidth = this.viewport.toZoom(0.5);
+    this.ctx.lineWidth = this.viewport.toZoom(1);
     this.ctx.moveTo(
-      0.5 + Math.round(this.viewport.worldToViewport(to).x),
-      0.5 + Math.round(this.viewport.worldToViewport(to).y),
+      0 + Math.round(this.viewport.worldToViewport(to).x),
+      0 + Math.round(this.viewport.worldToViewport(to).y),
     );
     this.ctx.lineTo(
-      0.5 + Math.round(this.viewport.worldToViewport(from).x),
-      0.5 + Math.round(this.viewport.worldToViewport(from).y),
+      0 + Math.round(this.viewport.worldToViewport(from).x),
+      0 + Math.round(this.viewport.worldToViewport(from).y),
     );
     this.ctx.stroke();
   }
