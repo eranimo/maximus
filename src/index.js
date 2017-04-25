@@ -1,6 +1,5 @@
 // @flow
 import Point from './point';
-import Intersection from './intersection';
 import anime from 'animejs';
 import './style.css';
 import _ from 'lodash';
@@ -20,8 +19,8 @@ type Size = {
   height: number
 };
 
-const SCENE_CELLS_WIDTH = 100;
-const SCENE_CELLS_HEIGHT = 100;
+const SCENE_CELLS_WIDTH = 1000;
+const SCENE_CELLS_HEIGHT = 1000;
 const CELL_SIZE = 20;
 const SCENE_WIDTH = SCENE_CELLS_WIDTH * CELL_SIZE;
 const SCENE_HEIGHT = SCENE_CELLS_HEIGHT * CELL_SIZE;
@@ -70,7 +69,7 @@ function cleanBoard(board: Board): Board {
 }
 
 function randomizeBoard(board: Board): Board {
-  let cells = _.random(50, 200);
+  let cells = _.random(500, 2000);
   for (let i = 0; i < cells; i++) {
     const x = _.random(0, SCENE_CELLS_WIDTH - 1);
     const y = _.random(0, SCENE_CELLS_HEIGHT - 1);
@@ -546,7 +545,7 @@ class Region {
   drawGridLine(from: Point, to: Point) {
     this.ctx.beginPath();
     this.ctx.strokeStyle = 'rgba(150, 150, 150, 1)';
-    this.ctx.lineWidth = this.viewport.toZoom(1);
+    this.ctx.lineWidth = this.viewport.toZoom(0.5);
     this.ctx.moveTo(
       0 + Math.round(to.x),
       0 + Math.round(to.y),
