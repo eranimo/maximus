@@ -10,7 +10,7 @@ export default class Board {
   grid: Array<Array<any>>;
 
   constructor() {
-    this.grid = _.times(SCENE_CELLS_WIDTH, () => _.times(SCENE_CELLS_HEIGHT, () => null));
+    this.grid = _.times(SCENE_CELLS_WIDTH, (): any => _.times(SCENE_CELLS_HEIGHT, (): any => null));
   }
 
   clean() {

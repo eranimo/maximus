@@ -26,7 +26,7 @@ export default class Minimap {
     // $FlowFixMe
     this.ctx = canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
-    this.ctx.translate(0.5, 0.5)
+    this.ctx.translate(0.5, 0.5);
 
     this.setupEvents();
     this.canvas.style.cursor = 'crosshair';
@@ -61,14 +61,14 @@ export default class Minimap {
 
   draw() {
     const ctx = this.ctx;
-    const { viewportSize, sceneSize } = this.viewport;
-    const toZoom = this.viewport.toZoom.bind(this.viewport);
-    const fromZoom = this.viewport.fromZoom.bind(this.viewport);
-
-    const minimapOrigin = {
-      x: 0.5 + viewportSize.width - MINIMAP_WIDTH,
-      y: 0.5 + viewportSize.height - MINIMAP_HEIGHT,
-    };
+    const { sceneSize } = this.viewport;
+    // const toZoom = this.viewport.toZoom.bind(this.viewport);
+    // const fromZoom = this.viewport.fromZoom.bind(this.viewport);
+    //
+    // const minimapOrigin = {
+    //   x: 0.5 + viewportSize.width - MINIMAP_WIDTH,
+    //   y: 0.5 + viewportSize.height - MINIMAP_HEIGHT,
+    // };
 
     // minimap background
     ctx.beginPath();

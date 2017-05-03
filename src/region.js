@@ -25,8 +25,7 @@ export default class Region {
     // $FlowFixMe
     this.ctx = canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
-    this.ctx.translate(0.5, 0.5)
-
+    this.ctx.translate(0.5, 0.5);
   }
 
   get boardRect(): Object {
@@ -167,7 +166,7 @@ export default class Region {
 
   // calculate a line in world coordinates
   // will return the end points of the line in viewport coordinates
-  calculateGridLine(from: Point, to: Point) {
+  calculateGridLine(from: Point, to: Point): Object {
     let newFrom = new Point(
       _.clamp(from.x, 0, this.viewport.sceneSize.width),
       _.clamp(from.y, 0, this.viewport.sceneSize.height),

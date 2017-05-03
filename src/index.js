@@ -1,19 +1,13 @@
 // @flow
-import Point from './point';
 import './style.css';
-import _ from 'lodash';
 import World from './world';
-
 import {
-  SCENE_WIDTH,
-  SCENE_HEIGHT,
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
   MINIMAP_WIDTH,
   MINIMAP_HEIGHT,
-  SCENE_CELLS_WIDTH,
-  SCENE_CELLS_HEIGHT,
 } from './constants';
+
 
 export type Cell = {
   color: string
@@ -44,4 +38,4 @@ window.onload = () => {
     minimap: minimapCanvas,
   });
   world.loop();
-}
+};

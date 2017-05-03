@@ -1,5 +1,5 @@
 export default class Point {
-  constructor(x, y) {
+  constructor(x: number | Object, y: number) {
     if (arguments.length === 2 ) {
       this.x = x;
       this.y = y;

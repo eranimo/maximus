@@ -7,7 +7,6 @@ import {
   SCENE_WIDTH,
   CELL_SIZE,
   SCENE_CELLS_WIDTH,
-  SCENE_CELLS_HEIGHT,
   ZOOM_INTERVAL,
   ZOOM_MIN,
   ZOOM_MAX,
@@ -45,13 +44,11 @@ export default class Viewport {
     this.canvas.addEventListener('mousemove', this.panMove.bind(this));
     this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
     this.canvas.addEventListener('wheel', this.handleZoom.bind(this));
-    // $FlowFixMe
-    document.addEventListener('keyup', event => {
+    document.addEventListener('keyup', (event: KeyboardEvent) => {
       this.keysPressed[event.keyCode] = false;
       this.handleKeyup(event);
     });
-    // $FlowFixMe
-    document.addEventListener('keydown', event => {
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
       this.keysPressed[event.keyCode] = true;
     });
 
@@ -95,7 +92,7 @@ export default class Viewport {
     return this.keysPressed[keyCode] === true;
   }
 
-  handleKeyup(event: MouseEvent) {
+  handleKeyup(event: KeyboardEvent) {
     if (event.keyCode === 32) {
       this.changeZoomLevel(1, this.cursorLocation.x, this.cursorLocation.y);
     } else if (event.keyCode === 13) {
@@ -213,7 +210,7 @@ export default class Viewport {
       update() {
         jump(current);
       }
-    })
+    });
   }
 
   panUp() {
@@ -233,7 +230,7 @@ export default class Viewport {
       const diff = {
         x: (this.panLocation.x - event.offsetX) / -1,
         y: (this.panLocation.y - event.offsetY) / -1,
-      }
+      };
       this.offset.x += this.fromZoom(diff.x);
       this.offset.y += this.fromZoom(diff.y);
       if (this.panLocation == null) {
@@ -297,7 +294,7 @@ export default class Viewport {
   }
 
   // returns boolean if a viewport point is in the viewport
-  isWorldPointVisible(point: Point) {
+  isWorldPointVisible(point: Point): boolean {
     point = this.viewportToWorld(point);
     return this.topLeft.x >= point.x && point.x <= this.bottomRight.x ||
            this.topLeft.y >= point.y && point.y <= this.bottomRight.y;

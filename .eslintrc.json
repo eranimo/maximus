@@ -2,7 +2,6 @@
   "parser": "babel-eslint",
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended",
     "plugin:flowtype/recommended"
   ],
   "plugins": [
@@ -33,6 +32,6 @@
     "flowtype/space-before-type-colon": 2,
     "flowtype/require-parameter-type": 2,
     "flowtype/require-return-type": 2,
-    "flowtype/require-variable-type": 2
+    "flowtype/require-variable-type": 0
   }
 }
