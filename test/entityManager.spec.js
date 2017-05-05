@@ -2,36 +2,57 @@
 import EntityManager, { Component, Entity } from '../src/entityManager';
 
 class FoobarComponent extends Component {
-  ticks: number;
+  state: {
+    ticks: number
+  };
+  foo: number;
 
-  init(state: Object) {
-    this.ticks = state.ticks;
+  init() {
+    this.foo = this.entity.components.size;
   }
 
   update() {
-    this.ticks++;
+    this.state.ticks++;
   }
 }
 const foobarComponent = FoobarComponent;
 
 describe('EntityManager', () => {
   const manager: EntityManager = new EntityManager();
+  manager.registerComponent('foobar', foobarComponent);
+  const fooEntity: Entity = manager.addEntity({
+    foobar: {
+      ticks: 0
+    }
+  });
 
   it('should load state from object', () => {
-    manager.addComponent('Foobar', foobarComponent);
-
-
-    const fooEntity: Entity = manager.addEntity(new Map([
-      [foobarComponent, {
-        ticks: 0
-      }],
-    ]));
-
-    manager.update();
-    const foobarComp: ?FoobarComponent = fooEntity.getComponent('Foobar');
+    const foobarComp: ?FoobarComponent = fooEntity.getComponent('foobar');
     if (!foobarComp) {
       throw new Error('Foobar component not found!');
     }
-    expect(foobarComp.ticks).toBe(1);
+    expect(foobarComp.state.ticks).toBe(0);
+  });
+
+  it('should update components', () => {
+    const foobarComp: ?FoobarComponent = fooEntity.getComponent('foobar');
+    if (!foobarComp) {
+      throw new Error('Foobar component not found!');
+    }
+    manager.update();
+    expect(foobarComp.state.ticks).toBe(1);
+  });
+
+  it('should get components in all entities', () => {
+    expect(manager.getComponents('foobar').length).toBe(1);
+    expect(manager.getComponents('foobar')[0]).toBeInstanceOf(FoobarComponent);
+  });
+
+  it('should export entity state', () => {
+    expect(fooEntity.export()).toEqual({
+      foobar: {
+        ticks: 1
+      }
+    });
   });
 });

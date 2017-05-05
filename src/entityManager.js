@@ -18,13 +18,15 @@ System:
 */
 export class Component {
   entity: Entity;
+  state: Object;
 
   constructor(entity: Entity, state: Object) {
     this.entity = entity;
-    this.init(state);
+    this.state = state;
+    this.init();
   }
 
-  init(state: Object) {}
+  init() {}
 
   update() {
     throw new Error('Not implemented');
@@ -45,23 +47,31 @@ export class Entity {
   getComponent(identifier: string): ?$Subtype<Component> {
     return this.components.get(identifier);
   }
+
+  export(): Object {
+    const data = {};
+    for (const [identifier, instance]: [string, Component] of this.components.entries()) {
+      data[identifier] = instance.state;
+    }
+    return data;
+  }
 }
 
 export default class EntityManager {
   entities: Array<Entity>;
-  componentMap: Map<Class<Component>, string>;
+  componentMap: Map<string, Class<Component>>;
 
   constructor() {
     this.componentMap = new Map();
     this.entities = [];
   }
 
-  addEntity(components: Map<Class<Component>, Object>, state: Object = {}): Entity {
-    const entity: Entity = new Entity(state);
-    for (const [comp, state]: [Class<Component>, Object] of components) {
-      const identifier: ?string = this.componentMap.get(comp);
-      if (identifier) {
-        const component: Component = new comp(entity, state);
+  addEntity(components: { [string]: Object }): Entity {
+    const entity: Entity = new Entity();
+    for (const [identifier, state]: [string, any] of Object.entries(components)) {
+      const _class: ?Class<Component> = this.componentMap.get(identifier);
+      if (_class) {
+        const component: Component = new _class(entity, state);
         entity.addComponent(identifier, component);
       }
     }
@@ -69,8 +79,19 @@ export default class EntityManager {
     return entity;
   }
 
-  addComponent(name: string, component: Class<Component>) {
-    this.componentMap.set(component, name);
+  registerComponent(name: string, component: Class<Component>) {
+    this.componentMap.set(name, component);
+  }
+
+  getComponents(identifier: string): Array<Component> {
+    const components: Array<Component> = [];
+    for (const entity of this.entities) {
+      const comp: ?Component = entity.getComponent(identifier);
+      if (comp) {
+        components.push(comp);
+      }
+    }
+    return components;
   }
 
   // update all entities
