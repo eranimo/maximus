@@ -64,27 +64,14 @@ export default class Minimap {
     const { sceneSize } = this.viewport;
 
     // minimap background
-    ctx.beginPath();
-    ctx.fillStyle = 'white';
-    ctx.rect(
-      0,
-      0,
-      MINIMAP_WIDTH,
-      MINIMAP_HEIGHT,
-    );
-    ctx.fill();
-
-    // minimap frame
-    ctx.beginPath();
-    ctx.strokeStyle = 'red';
-    ctx.lineWidth = 1;
-    const { width, height } = this.viewport.getViewportRealSize();
-    ctx.rect(
-      1.0 + Math.round((-this.viewport.offset.x / sceneSize.width) * MINIMAP_WIDTH),
-      1.0 + Math.round((-this.viewport.offset.y / sceneSize.height) * MINIMAP_HEIGHT),
-      Math.round(MINIMAP_WIDTH * (width / sceneSize.width)),
-      Math.round(MINIMAP_HEIGHT * (height / sceneSize.height)),
-    );
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.fillStyle = 'white';
+    // ctx.rect(
+    //   0,
+    //   0,
+    //   MINIMAP_WIDTH,
+    //   MINIMAP_HEIGHT,
+    // );
+    // ctx.fill();
   }
 }

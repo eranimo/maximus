@@ -1,6 +1,12 @@
 import EntityManager, { Entity } from './entityManager';
 import Point from './point';
 
+export function makeMinimap(manager: EntityManager): Entity {
+  return manager.addEntity({
+    minimapFrame: {},
+    minimapBackdrop: {},
+  }, 'minimap');
+}
 
 export function makeBuilding(manager: EntityManager, pos: Point, name: ?string): Entity {
   return manager.addEntity({
@@ -8,7 +14,7 @@ export function makeBuilding(manager: EntityManager, pos: Point, name: ?string):
       pos,
       color: 'blue',
     },
-    minimap: {
+    minimapPoint: {
       pos,
       color: 'blue',
     }

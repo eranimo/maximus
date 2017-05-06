@@ -82,5 +82,6 @@ describe('EntityManager', () => {
     }
     expect(foobarComp.state.foo).toEqual('bar');
 
+    expect(system.getComponents()).toEqual([foobarComp]);
   });
 });

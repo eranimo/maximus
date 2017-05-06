@@ -3,7 +3,7 @@ import Point from '../point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 
-export default class DisplayComponent extends Component {
+export default class Box extends Component {
   state: {
     pos: Point,
     color: string,

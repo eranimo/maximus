@@ -1,28 +1,24 @@
-import EntityManager, { System } from '../entityManager';
-import MinimapComponent from '../components/minimap';
+import type { Component } from '../entityManager';
+import { MinimapPoint, MinimapBackdrop, MinimapFrame } from '../components/minimap';
+import RenderSystem from './render';
 
 
-export default class UISystem extends System {
-  ctx: CanvasRenderingContext2D;
-
+export default class UISystem extends RenderSystem {
   static componentTypes = [
-    MinimapComponent,
+    MinimapBackdrop,
+    MinimapFrame,
+    MinimapPoint,
   ];
 
-  constructor(manager: EntityManager, ctx: CanvasRenderingContext2D) {
-    super(manager);
-    this.ctx = ctx;
-  }
-
   update() {
-    for (const comp: DisplayComponent of this.getComponents()) {
+    for (const comp: $Subtype<Component> of this.getComponents()) {
       comp.update();
     }
   }
 
   draw() {
     this.getComponents().forEach((comp: Component) => {
-      comp.draw(this.ctx);
+      comp.draw(this.viewport, this.ctx);
     });
   }
 }

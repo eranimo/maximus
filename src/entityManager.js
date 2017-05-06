@@ -71,15 +71,18 @@ export class System {
 
   getComponents(): Array<$Subtype<Component>> {
     let foundComponents: Array<$Subtype<Component>> = [];
-    for (const entity of this.manager.entities) {
-      const components = entity.components.values();
-      for (const comp: $Subtype<Component> of components) {
-        for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
-          if (comp instanceof type) {
-            foundComponents.push(comp);
-          }
-        }
-      }
+    // for (const entity of this.manager.entities) {
+    //   const components = entity.components.values();
+    //   for (const comp: $Subtype<Component> of components) {
+    //     for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
+    //       if (comp instanceof type) {
+    //         foundComponents.push(comp);
+    //       }
+    //     }
+    //   }
+    // }
+    for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
+      foundComponents.push(...this.manager.componentInstancesMap.get(type) || []);
     }
     return foundComponents;
   }
@@ -91,19 +94,25 @@ export class System {
 
 export default class EntityManager {
   entities: Array<Entity>;
-  componentMap: Map<string, Class<Component>>;
+  componentTypes: Map<string, Class<Component>>;
+  componentInstancesMap: Map<Class<$Subtype<Component>>, Array<$Subtype<Component>>>;
 
   constructor() {
-    this.componentMap = new Map();
+    this.componentTypes = new Map();
+    this.componentInstancesMap = new Map();
     this.entities = [];
   }
 
   addEntity(components: { [string]: Object }, name: ?string): Entity {
     const entity: Entity = new Entity(name);
     for (const [identifier, state]: [string, any] of Object.entries(components)) {
-      const _class: ?Class<Component> = this.componentMap.get(identifier);
+      const _class: ?Class<Component> = this.componentTypes.get(identifier);
       if (_class) {
         const component: Component = new _class(entity, state);
+        this.componentInstancesMap.set(_class, [
+          ...this.componentInstancesMap.get(identifier) || [],
+          component,
+        ]);
         entity.addComponent(identifier, component);
       }
     }
@@ -112,7 +121,7 @@ export default class EntityManager {
   }
 
   registerComponent(name: string, component: Class<Component>) {
-    this.componentMap.set(name, component);
+    this.componentTypes.set(name, component);
   }
 
   getComponents(identifier: string): Array<Component> {

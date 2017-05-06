@@ -12,9 +12,11 @@ import EntityManager from './entityManager';
 import Point from './point';
 import DisplaySystem from './systems/display';
 import UISystem from './systems/ui';
-import DisplayComponent from './components/display';
-import MinimapComponent from './components/minimap';
-import { makeBuilding } from './entityFactory';
+
+import Box from './components/box';
+import { MinimapPoint, MinimapBackdrop, MinimapFrame } from './components/minimap';
+
+import { makeBuilding, makeMinimap } from './entityFactory';
 
 
 export default class World {
@@ -48,12 +50,15 @@ export default class World {
     this.speed = 1;
 
     this.manager = new EntityManager();
-    this.manager.registerComponent('display', DisplayComponent);
-    this.manager.registerComponent('minimap', MinimapComponent);
+    this.manager.registerComponent('display', Box);
+    this.manager.registerComponent('minimapPoint', MinimapPoint);
+    this.manager.registerComponent('minimapBackdrop', MinimapBackdrop);
+    this.manager.registerComponent('minimapFrame', MinimapFrame);
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
-    this.uiSystem = new UISystem(this.manager, this.minimap.ctx);
+    this.uiSystem = new UISystem(this.manager, this.viewport, this.minimap.ctx);
 
     makeBuilding(this.manager, new Point(10, 10), 'b1');
+    makeMinimap(this.manager);
   }
 
   draw(timeSinceLastUpdate: number) {
@@ -63,7 +68,7 @@ export default class World {
     this.uiSystem.draw();
   }
 
-  update(timeSinceLastUpdate: number) {
+  update() {
     this.viewport.tick();
     this.displaySystem.update();
     this.uiSystem.update();
@@ -88,7 +93,7 @@ export default class World {
       timeSinceLastUpdate += dt;
 
       if (timeSinceLastUpdate >= refreshDelay) {
-        this.update(timeSinceLastUpdate);
+        this.update();
 
         this.time = this.time + (timeSinceLastUpdate * this.speed);
       }
