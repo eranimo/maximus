@@ -62,13 +62,6 @@ export default class Minimap {
   draw() {
     const ctx = this.ctx;
     const { sceneSize } = this.viewport;
-    // const toZoom = this.viewport.toZoom.bind(this.viewport);
-    // const fromZoom = this.viewport.fromZoom.bind(this.viewport);
-    //
-    // const minimapOrigin = {
-    //   x: 0.5 + viewportSize.width - MINIMAP_WIDTH,
-    //   y: 0.5 + viewportSize.height - MINIMAP_HEIGHT,
-    // };
 
     // minimap background
     ctx.beginPath();
@@ -80,24 +73,6 @@ export default class Minimap {
       MINIMAP_HEIGHT,
     );
     ctx.fill();
-
-    // minimap board
-    // for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
-    //   for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-    //     const cell = this.world.board.grid[x][y];
-    //     if (cell) {
-    //       ctx.beginPath();
-    //       ctx.fillStyle = cell.color;
-    //       ctx.fillRect(
-    //         0.5 + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
-    //         0.5 + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
-    //         1,
-    //         1,
-    //       );
-    //       ctx.fill();
-    //     }
-    //   }
-    // }
 
     // minimap frame
     ctx.beginPath();

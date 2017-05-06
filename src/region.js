@@ -77,9 +77,6 @@ export default class Region {
       }
     }
 
-    // cells
-    // this.drawCells();
-
     const cursor = viewport.cursorLocation;
     ctx.font = '20px sans-serif';
     ctx.fillStyle = '#333';
@@ -118,52 +115,6 @@ export default class Region {
       cellSize,
     );
     this.ctx.stroke();
-  }
-
-  drawCells() {
-    for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
-      for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
-        const cell = this.world.board.grid[x][y];
-        if (cell) {
-          this.ctx.fillStyle = cell.color;
-
-          const intersect = this.calculateRect(
-            new Point(x * CELL_SIZE, y * CELL_SIZE),
-            CELL_SIZE,
-            CELL_SIZE,
-          );
-          if (intersect) {
-            this.ctx.fillRect(
-              intersect.topLeft.x,
-              intersect.topLeft.y,
-              intersect.width,
-              intersect.height,
-            );
-          }
-        }
-      }
-    }
-  }
-
-  // calculate a rectangle in world coordinates
-  // will return the top left and bottom right points in the viewport
-  calculateRect(loc: Point, width: number, height: number): ?Object {
-    const loc2 = new Point(loc.x + width, loc.y + height);
-    const loc3 = new Point(loc.x, loc.y + height);
-    const loc4 = new Point(loc.x + width, loc.y);
-    if (
-      this.viewport.isInViewport(this.viewport.worldToViewport(loc)) ||
-      this.viewport.isInViewport(this.viewport.worldToViewport(loc2)) ||
-      this.viewport.isInViewport(this.viewport.worldToViewport(loc3)) ||
-      this.viewport.isInViewport(this.viewport.worldToViewport(loc4))
-    ) {
-      const topLeft = this.viewport.worldToViewport(loc);
-      const bottomRight = this.viewport.worldToViewport(loc2);
-      const newWidth = bottomRight.x - topLeft.x;
-      const newHeight = bottomRight.y - topLeft.y;
-      return { topLeft, width: newWidth, height: newHeight };
-    }
-    return null;
   }
 
   // calculate a line in world coordinates
