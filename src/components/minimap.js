@@ -7,7 +7,7 @@ import {
 } from '../constants';
 
 
-export class MinimapComponent extends Component {
+export default class MinimapComponent extends Component {
   state: {
     pos: Point,
     color: string,

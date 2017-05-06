@@ -1,5 +1,5 @@
 import EntityManager, { System } from '../entityManager';
-import { MinimapComponent } from '../components/ui';
+import MinimapComponent from '../components/minimap';
 
 
 export default class UISystem extends System {

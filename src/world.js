@@ -13,7 +13,7 @@ import Point from './point';
 import DisplaySystem from './systems/display';
 import UISystem from './systems/ui';
 import DisplayComponent from './components/display';
-import { MinimapComponent } from './components/ui';
+import MinimapComponent from './components/minimap';
 import { makeBuilding } from './entityFactory';
 
 
