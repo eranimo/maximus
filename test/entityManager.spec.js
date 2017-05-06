@@ -1,10 +1,8 @@
 // @flow
-import EntityManager, { Component, Entity } from '../src/entityManager';
+import EntityManager, { Component, Entity, System } from '../src/entityManager';
 
 class FoobarComponent extends Component {
-  state: {
-    ticks: number
-  };
+  state: Object;
   foo: number;
 
   init() {
@@ -13,6 +11,10 @@ class FoobarComponent extends Component {
 
   update() {
     this.state.ticks++;
+  }
+
+  on(event: Object) {
+    this.state.foo = event.foo;
   }
 }
 const foobarComponent = FoobarComponent;
@@ -54,5 +56,26 @@ describe('EntityManager', () => {
         ticks: 1
       }
     });
+  });
+
+  it('should work with systems', () => {
+    class FooSystem extends System {
+      update() {
+        for (const comp: $Subtype<Component> of this.getComponents()) {
+          comp.on({
+            foo: 'bar'
+          });
+        }
+      }
+    }
+    const system: FooSystem = new FooSystem(manager, [FoobarComponent]);
+    manager.update();
+    system.update();
+    const foobarComp: ?FoobarComponent = fooEntity.getComponent('foobar');
+    if (!foobarComp) {
+      throw new Error('Foobar component not found!');
+    }
+    expect(foobarComp.state.foo).toEqual('bar');
+
   });
 });

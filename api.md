@@ -35,4 +35,3 @@
 - `components` - *Array<Class<Component>>* - a list of component types this system operates on
 #### Methods
 - `update` - called once every game loop. Allows a system to dispatch events components
-- `emit`

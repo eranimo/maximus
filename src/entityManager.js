@@ -13,8 +13,6 @@ EntityManager:
 System:
   - a function that gets entities with certain components and does something with them
 
-
-
 */
 export class Component {
   entity: Entity;
@@ -31,6 +29,8 @@ export class Component {
   update() {
     throw new Error('Not implemented');
   }
+
+  on(event: GameEvent) {} // eslint-disable-line
 }
 
 export class Entity {
@@ -54,6 +54,40 @@ export class Entity {
       data[identifier] = instance.state;
     }
     return data;
+  }
+}
+
+export type GameEvent = {
+  name: string,
+  value: Object,
+};
+
+export class System {
+  manager: EntityManager;
+  componentTypes: Array<Class<$Subtype<Component>>>;
+
+  constructor(manager: EntityManager, componentTypes: Array<Class<$Subtype<Component>>>) {
+    this.manager = manager;
+    this.componentTypes = componentTypes;
+  }
+
+  getComponents(): Array<$Subtype<Component>> {
+    let foundComponents: Array<$Subtype<Component>> = [];
+    for (const entity of this.manager.entities) {
+      const components = entity.components.values();
+      for (const comp: $Subtype<Component> of components) {
+        for (const type: Class<$Subtype<Component>> of this.componentTypes) {
+          if (comp instanceof type) {
+            foundComponents.push(comp);
+          }
+        }
+      }
+    }
+    return foundComponents;
+  }
+
+  update() {
+    throw new Error('Not implemented');
   }
 }
 
