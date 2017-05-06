@@ -1,16 +1,18 @@
 import EntityManager, { System } from '../entityManager';
-import { MinimapComponent } from '../components/ui';
+import DisplayComponent from '../components/display';
+import Viewport from '../viewport';
 
-
-export default class UISystem extends System {
+export default class DisplaySystem extends System {
+  viewport: Viewport;
   ctx: CanvasRenderingContext2D;
 
   static componentTypes = [
-    MinimapComponent,
+    DisplayComponent,
   ];
 
-  constructor(manager: EntityManager, ctx: CanvasRenderingContext2D) {
+  constructor(manager: EntityManager, viewport: Viewport, ctx: CanvasRenderingContext2D) {
     super(manager);
+    this.viewport = viewport;
     this.ctx = ctx;
   }
 
@@ -22,7 +24,7 @@ export default class UISystem extends System {
 
   draw() {
     this.getComponents().forEach((comp: Component) => {
-      comp.draw(this.ctx);
+      comp.draw(this.viewport, this.ctx);
     });
   }
 }

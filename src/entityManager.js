@@ -25,18 +25,17 @@ export class Component {
   }
 
   init() {}
-
-  update() {
-    throw new Error('Not implemented');
-  }
+  update() {}
 
   on(event: GameEvent) {} // eslint-disable-line
 }
 
 export class Entity {
+  name: ?string;
   components: Map<string, $Subtype<Component>>;
 
-  constructor() {
+  constructor(name: ?string) {
+    this.name = name;
     this.components = new Map();
   }
 
@@ -64,11 +63,10 @@ export type GameEvent = {
 
 export class System {
   manager: EntityManager;
-  componentTypes: Array<Class<$Subtype<Component>>>;
+  static componentTypes: Array<Class<$Subtype<Component>>> = [];
 
-  constructor(manager: EntityManager, componentTypes: Array<Class<$Subtype<Component>>>) {
+  constructor(manager: EntityManager) {
     this.manager = manager;
-    this.componentTypes = componentTypes;
   }
 
   getComponents(): Array<$Subtype<Component>> {
@@ -76,7 +74,7 @@ export class System {
     for (const entity of this.manager.entities) {
       const components = entity.components.values();
       for (const comp: $Subtype<Component> of components) {
-        for (const type: Class<$Subtype<Component>> of this.componentTypes) {
+        for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
           if (comp instanceof type) {
             foundComponents.push(comp);
           }
@@ -100,8 +98,8 @@ export default class EntityManager {
     this.entities = [];
   }
 
-  addEntity(components: { [string]: Object }): Entity {
-    const entity: Entity = new Entity();
+  addEntity(components: { [string]: Object }, name: ?string): Entity {
+    const entity: Entity = new Entity(name);
     for (const [identifier, state]: [string, any] of Object.entries(components)) {
       const _class: ?Class<Component> = this.componentMap.get(identifier);
       if (_class) {

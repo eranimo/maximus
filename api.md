@@ -22,7 +22,7 @@
 - `destroy` - called when this component is removed from an entity
 - `update` - called on the game loop after its dependencies
 - `emit(String eventName, Object eventValue)` - broadcast an event to the components in this entity
-- `on(Event event)` - respond to an event broadcasted to this component
+- `on(GameEvent event)` - respond to an event broadcasted to this component
 - `toJSON` - serialized the component's state as a JSON object
 
 ## Static Methods
@@ -31,7 +31,8 @@
 
 # System
 
-#### Properties
-- `components` - *Array<Class<Component>>* - a list of component types this system operates on
+#### Static Properties
+- `componentTypes` - *Array<Class<Component>>* - a list of component types this system operates on
 #### Methods
+- `getComponents` - gets all the components in the entity system that this system wants
 - `update` - called once every game loop. Allows a system to dispatch events components

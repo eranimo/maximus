@@ -1,5 +1,6 @@
 // @flow
 import EntityManager, { Component, Entity, System } from '../src/entityManager';
+import type { GameEvent } from '../src/entityManager';
 
 class FoobarComponent extends Component {
   state: Object;
@@ -13,8 +14,8 @@ class FoobarComponent extends Component {
     this.state.ticks++;
   }
 
-  on(event: Object) {
-    this.state.foo = event.foo;
+  on(event: GameEvent) {
+    this.state.foo = event.value.foo;
   }
 }
 const foobarComponent = FoobarComponent;
@@ -60,15 +61,19 @@ describe('EntityManager', () => {
 
   it('should work with systems', () => {
     class FooSystem extends System {
+      static componentTypes = [FoobarComponent];
       update() {
-        for (const comp: $Subtype<Component> of this.getComponents()) {
+        for (const comp: FoobarComponent of this.getComponents()) {
           comp.on({
-            foo: 'bar'
+            name: 'Foo',
+            value: {
+              foo: 'bar'
+            }
           });
         }
       }
     }
-    const system: FooSystem = new FooSystem(manager, [FoobarComponent]);
+    const system: FooSystem = new FooSystem(manager);
     manager.update();
     system.update();
     const foobarComp: ?FoobarComponent = fooEntity.getComponent('foobar');

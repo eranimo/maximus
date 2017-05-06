@@ -78,7 +78,7 @@ export default class Region {
     }
 
     // cells
-    this.drawCells();
+    // this.drawCells();
 
     const cursor = viewport.cursorLocation;
     ctx.font = '20px sans-serif';

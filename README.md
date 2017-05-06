@@ -15,14 +15,16 @@ All game objects are instances of the `Entity` class. Entities are containers fo
 ### Components
 A `Component` encapsulates a specific behavior for an object. A component is an instance separate from its parent entity. A component has its own state which can be serialized to JSON. This enables the entire state of the system to be saved and reloaded at any time. Many concepts can be implemented as components.
 
+
 #### Examples
-- `DisplayComponent` - handles displaying an object in the viewport
-- `UIComponent` - handles the display of an object
-- `UIEventComponent` - respond to events from the keyboard
+- `DisplayComponent` - handles the display of a game object
+- `UIComponent` - handles the display of a UI object
+- `KeyboardComponent` - handles keyboard input given from the KeyboardSystem
 
 ### Systems
 A `System` is a class whose instances are used to control components.
 
 #### Examples
 - `RenderSystem` - render DisplayComponents and UIComponents
-- `UIEventSystem` - provide user feedback to EventTrigger
+- `UISystem` - provide user feedback to EventTrigger
+- `KeyboardSystem` - sends keyboard events to KeyboardComponents

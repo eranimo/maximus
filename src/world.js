@@ -9,6 +9,13 @@ import {
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
 } from './constants';
+import EntityManager from './entityManager';
+import Point from './point';
+import DisplaySystem from './systems/display';
+import UISystem from './systems/ui';
+import DisplayComponent from './components/display';
+import { MinimapComponent } from './components/ui';
+import { makeBuilding } from './entityFactory';
 
 
 export default class World {
@@ -22,6 +29,10 @@ export default class World {
   board: Board;
   time: number;
   speed: number;
+
+  manager: EntityManager;
+  displaySystem: DisplaySystem;
+  uiSystem: DisplaySystem;
 
   constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
     this.viewport = new Viewport({
@@ -39,20 +50,27 @@ export default class World {
     this.minimap = new Minimap(this, minimap, this.viewport);
     this.time = 1;
     this.speed = 1;
+
+    this.manager = new EntityManager();
+    this.manager.registerComponent('display', DisplayComponent);
+    this.manager.registerComponent('minimap', MinimapComponent);
+    this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
+    this.uiSystem = new UISystem(this.manager, this.minimap.ctx);
+
+    makeBuilding(this.manager, new Point(10, 10), 'b1');
   }
 
   draw(timeSinceLastUpdate: number) {
     this.region.draw(timeSinceLastUpdate);
+    this.displaySystem.draw();
     this.minimap.draw();
+    this.uiSystem.draw();
   }
 
   update(timeSinceLastUpdate: number) {
     this.viewport.tick();
-
-    // if (this.tick % 120099 === 0) {
-    //   this.board = randomizeBoard(cleanBoard(this.board));
-    //   console.log('new board');
-    // }
+    this.displaySystem.update();
+    this.uiSystem.update();
     this.tick++;
   }
 
