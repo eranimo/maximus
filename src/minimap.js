@@ -14,6 +14,7 @@ export default class Minimap {
   ctx: CanvasRenderingContext2D;
   viewport: Viewport;
   world: World;
+
   isPanning: boolean;
 
   constructor(world: World, canvas: HTMLElement, viewport: Viewport) {
@@ -57,21 +58,5 @@ export default class Minimap {
         y: Math.round((event.offsetY / MINIMAP_HEIGHT) * this.viewport.sceneSize.height),
       });
     }
-  }
-
-  draw() {
-    const ctx = this.ctx;
-    const { sceneSize } = this.viewport;
-
-    // minimap background
-    // ctx.beginPath();
-    // ctx.fillStyle = 'white';
-    // ctx.rect(
-    //   0,
-    //   0,
-    //   MINIMAP_WIDTH,
-    //   MINIMAP_HEIGHT,
-    // );
-    // ctx.fill();
   }
 }

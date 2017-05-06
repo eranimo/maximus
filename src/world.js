@@ -64,7 +64,6 @@ export default class World {
   draw(timeSinceLastUpdate: number) {
     this.region.draw(timeSinceLastUpdate);
     this.displaySystem.draw();
-    this.minimap.draw();
     this.uiSystem.draw();
   }
 

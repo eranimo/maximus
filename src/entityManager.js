@@ -71,16 +71,6 @@ export class System {
 
   getComponents(): Array<$Subtype<Component>> {
     let foundComponents: Array<$Subtype<Component>> = [];
-    // for (const entity of this.manager.entities) {
-    //   const components = entity.components.values();
-    //   for (const comp: $Subtype<Component> of components) {
-    //     for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
-    //       if (comp instanceof type) {
-    //         foundComponents.push(comp);
-    //       }
-    //     }
-    //   }
-    // }
     for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
       foundComponents.push(...this.manager.componentInstancesMap.get(type) || []);
     }
@@ -110,7 +100,7 @@ export default class EntityManager {
       if (_class) {
         const component: Component = new _class(entity, state);
         this.componentInstancesMap.set(_class, [
-          ...this.componentInstancesMap.get(identifier) || [],
+          ...this.componentInstancesMap.get(_class) || [],
           component,
         ]);
         entity.addComponent(identifier, component);

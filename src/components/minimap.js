@@ -7,9 +7,10 @@ import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
 } from '../constants';
+import type RenderComponent from './render';
 
 
-export class MinimapPoint extends Component {
+export class MinimapPoint extends Component implements RenderComponent {
   state: {
     pos: Point,
     color: string,
@@ -30,7 +31,7 @@ export class MinimapPoint extends Component {
   }
 }
 
-export class MinimapBackdrop extends Component {
+export class MinimapBackdrop extends Component implements RenderComponent {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.fillStyle = 'white';
@@ -44,7 +45,7 @@ export class MinimapBackdrop extends Component {
   }
 }
 
-export class MinimapFrame extends Component {
+export class MinimapFrame extends Component implements RenderComponent {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
     ctx.strokeStyle = 'red';
