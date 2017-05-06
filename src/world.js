@@ -20,6 +20,8 @@ export default class World {
   minimap: Minimap;
   tick: number;
   board: Board;
+  time: number;
+  speed: number;
 
   constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
     this.viewport = new Viewport({
@@ -35,14 +37,16 @@ export default class World {
     this.board.randomize();
     this.region = new Region(this, main, this.viewport);
     this.minimap = new Minimap(this, minimap, this.viewport);
+    this.time = 1;
+    this.speed = 1;
   }
 
-  draw() {
-    this.region.draw();
+  draw(timeSinceLastUpdate: number) {
+    this.region.draw(timeSinceLastUpdate);
     this.minimap.draw();
   }
 
-  update() {
+  update(timeSinceLastUpdate: number) {
     this.viewport.tick();
 
     // if (this.tick % 120099 === 0) {
@@ -53,11 +57,32 @@ export default class World {
   }
 
   loop() {
-    this.update();
-    this.draw();
+    const VIDEO_FPS = 60;
+    const refreshDelay = 1000 / VIDEO_FPS;
+    let timeOfLastExecution;
+    let timeSinceLastUpdate = 0;
+    const execute = () => {
+      const now = Date.now();
 
-    requestAnimationFrame(() => {
-      this.loop();
-    });
+      // time since last execution
+      const dt = now - (timeOfLastExecution || now);
+
+      // set timeOfLastExecution as now
+      timeOfLastExecution = now;
+
+      // if we don't update the UI now, increase timeSinceLastUpdate by dt
+      timeSinceLastUpdate += dt;
+
+      if (timeSinceLastUpdate >= refreshDelay) {
+        this.update(timeSinceLastUpdate);
+
+        this.time = this.time + (timeSinceLastUpdate * this.speed);
+      }
+      this.draw(timeSinceLastUpdate);
+      timeSinceLastUpdate = 0;
+      requestAnimationFrame(execute);
+    };
+
+    requestAnimationFrame(execute);
   }
 }
