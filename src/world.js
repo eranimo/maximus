@@ -2,7 +2,6 @@
 import Viewport from './viewport';
 import Region from './region';
 import Minimap from './minimap';
-import Board from './board';
 import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
@@ -26,7 +25,6 @@ export default class World {
   region: Region;
   minimap: Minimap;
   tick: number;
-  board: Board;
   time: number;
   speed: number;
 
@@ -44,8 +42,6 @@ export default class World {
     }, main);
     this.tick = 0;
     window.viewport = this.viewport;
-    this.board = new Board();
-    this.board.randomize();
     this.region = new Region(this, main, this.viewport);
     this.minimap = new Minimap(this, minimap, this.viewport);
     this.time = 1;

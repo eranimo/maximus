@@ -45,7 +45,7 @@ export default class Region {
 
 
     // grid
-    for (let x = 0; x <= this.world.board.grid.length; x++) {
+    for (let x = 0; x <= SCENE_CELLS_WIDTH; x++) {
       let pointFrom: Point = new Point(x * CELL_SIZE, 0);
       let pointTo: Point = new Point(
         x * CELL_SIZE,
@@ -61,7 +61,7 @@ export default class Region {
       }
     }
 
-    for (let y = 0; y <= this.world.board.grid.length; y++) {
+    for (let y = 0; y <= SCENE_CELLS_HEIGHT; y++) {
       let pointFrom: Point = new Point(0, y * CELL_SIZE);
       let pointTo: Point = new Point(
         SCENE_CELLS_WIDTH * CELL_SIZE,
