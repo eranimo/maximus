@@ -1,5 +1,5 @@
-import Point from '../src/point';
-import Rectangle from '../src/rectangle';
+import Point from '../src/geometry/point';
+import Rectangle from '../src/geometry/rectangle';
 
 describe('Rectangle', () => {
   const point: Point = new Point(10, 10);
