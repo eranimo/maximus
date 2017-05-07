@@ -3,7 +3,10 @@ import Rectangle from './geometry/rectangle';
 import Point from './geometry/point';
 import { CELL_SIZE } from './constants';
 import Color from './utils/color';
-
+import {
+  MINIMAP_WIDTH,
+  MINIMAP_HEIGHT,
+} from './constants';
 
 // factory functions that create entities
 
@@ -11,6 +14,16 @@ export function makeMinimap(manager: EntityManager): Entity {
   return manager.addEntity({
     minimapFrame: {},
     minimapBackdrop: {},
+    minimapLogic: {
+      bounds: new Rectangle(
+        new Point(
+          window.innerWidth - MINIMAP_WIDTH - 2,
+          window.innerHeight - MINIMAP_HEIGHT - 2,
+        ),
+        MINIMAP_WIDTH,
+        MINIMAP_HEIGHT
+      )
+    }
   }, 'minimap');
 }
 

@@ -16,7 +16,7 @@ import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 
 import Box from './components/box';
-import { MinimapPoint, MinimapBackdrop, MinimapFrame } from './components/minimap';
+import { MinimapPoint, MinimapBackdrop, MinimapFrame, MinimapLogic } from './components/minimap';
 import { UIViewportText, UIWorldText } from './components/ui';
 import EventTrigger from './components/eventTrigger';
 import { makeBuilding, makeMinimap } from './entityFactory';
@@ -65,11 +65,12 @@ export default class World {
       ['minimapPoint', MinimapPoint],
       ['minimapBackdrop', MinimapBackdrop],
       ['minimapFrame', MinimapFrame],
+      ['minimapLogic', MinimapLogic],
     ]);
 
     this.eventSystem = new EventSystem(this.manager, this.viewport, this.region.canvas);
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
-    this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.minimap.ctx);
+    this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
     this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
 
     const building: any = makeBuilding(this.manager, new Point(10, 10), 'b1');

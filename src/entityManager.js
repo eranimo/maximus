@@ -37,6 +37,7 @@ export class Component {
 
 export class Entity {
   name: ?string;
+  manager: EntityManager;
   components: Map<string, $Subtype<Component>>;
 
   constructor(name: ?string) {
@@ -81,6 +82,7 @@ export class System {
     );
   }
 
+  // gets the components this system cares about
   getComponents(): Array<$Subtype<Component>> {
     let foundComponents: Array<$Subtype<Component>> = [];
     for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
@@ -120,6 +122,7 @@ export default class EntityManager {
     for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
       instance.init();
     }
+    entity.manager = this;
     this.entities.push(entity);
     return entity;
   }

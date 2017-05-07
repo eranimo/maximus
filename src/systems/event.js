@@ -22,20 +22,34 @@ export default class EventSystem extends System {
     this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
   }
 
-  handleMouseDown(event: MouseEvent) {
+  processEvent(event: MouseEvent, callback: Function) {
     const { offsetX: x, offsetY: y } = event;
     const point: Point = this.viewport.viewportToWorld(new Point(x, y));
-    this.getComponents().forEach((comp: Component) => {
-      comp.isClicked = comp.state.bounds.containsPoint(point);
+    this.getComponents().forEach((comp: Component): void => callback(comp, point));
+  }
+
+  handleMouseDown(event: MouseEvent) {
+    this.processEvent(event, (comp: Component, point: Point) => {
+      if (comp.state.bounds) {
+        comp.isClicked = comp.state.bounds.containsPoint(point);
+      } else {
+        comp.isClicked = true;
+      }
     });
   }
 
   handleMouseMove(event: MouseEvent) {
-    const { offsetX: x, offsetY: y } = event;
-    const point: Point = this.viewport.viewportToWorld(new Point(x, y));
-    this.getComponents().forEach((comp: Component) => {
-      const isAtComponent = comp.state.bounds.containsPoint(point);
-      comp.isHover = isAtComponent;
+    this.processEvent(event, (comp: Component, point: Point) => {
+      if (comp.onMouseMove) {
+        comp.onMouseMove();
+      }
+
+      if (comp.state.bounds) {
+        const isAtComponent = comp.state.bounds.containsPoint(point);
+        comp.isHover = isAtComponent;
+      } else {
+        comp.isHover = true;
+      }
     });
   }
 }

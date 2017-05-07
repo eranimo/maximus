@@ -34,4 +34,8 @@ export default class Rectangle {
            this.x2 >= point.x &&
            this.y2 >= point.y;
   }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.rect(this.position.x, this.position.y, this.width, this.height);
+  }
 }
