@@ -3,6 +3,7 @@ import { MinimapPoint, MinimapBackdrop, MinimapFrame } from '../components/minim
 import RenderSystem from './render';
 
 
+// handles rendering minimap components
 export default class MinimapUISystem extends RenderSystem {
   static componentTypes = [
     MinimapBackdrop,

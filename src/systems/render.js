@@ -3,6 +3,7 @@ import type Viewport from '../viewport';
 import type EntityManager from '../entityManager';
 
 
+// base class for any System that handles RenderComponents
 export default class RenderSystem extends System {
   viewport: Viewport;
   ctx: CanvasRenderingContext2D;

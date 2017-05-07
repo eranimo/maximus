@@ -5,6 +5,7 @@ import Point from '../geometry/point';
 import Viewport from '../viewport';
 
 
+// a system that handles browser events passed to components
 export default class EventSystem extends System {
   static componentTypes = [
     EventTrigger,

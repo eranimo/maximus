@@ -5,6 +5,7 @@ import type RenderComponent from './render';
 import { CELL_SIZE } from '../constants';
 
 
+// text rendered onto the UI space
 export class UIViewportText extends Component implements RenderComponent {
   state: {
     pos: Point,
@@ -21,6 +22,7 @@ export class UIViewportText extends Component implements RenderComponent {
   }
 }
 
+// text rendered onto the world space (inside the viewport)
 export class UIWorldText extends Component implements RenderComponent {
   state: {
     position: Point,

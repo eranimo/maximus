@@ -10,6 +10,7 @@ import {
 import type RenderComponent from './render';
 
 
+// renders a point on the minimap
 export class MinimapPoint extends Component implements RenderComponent {
   state: {
     pos: Point,
@@ -31,6 +32,7 @@ export class MinimapPoint extends Component implements RenderComponent {
   }
 }
 
+// background of the minimap
 export class MinimapBackdrop extends Component implements RenderComponent {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();
@@ -45,6 +47,7 @@ export class MinimapBackdrop extends Component implements RenderComponent {
   }
 }
 
+// minimap frame that represent's the viewport's current view
 export class MinimapFrame extends Component implements RenderComponent {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
     ctx.beginPath();

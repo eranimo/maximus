@@ -10,6 +10,7 @@ import {
 } from './constants';
 
 
+// TODO: factor out into an entity with components controlled by a system
 export default class Region {
   world: World;
   ctx: CanvasRenderingContext2D;

@@ -5,6 +5,8 @@ import { CELL_SIZE } from './constants';
 import Color from './utils/color';
 
 
+// factory functions that create entities
+
 export function makeMinimap(manager: EntityManager): Entity {
   return manager.addEntity({
     minimapFrame: {},

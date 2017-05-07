@@ -9,6 +9,7 @@ import {
 } from './constants';
 
 
+// TODO: factor out into an entity with components controlled by a system
 export default class Minimap {
   canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
