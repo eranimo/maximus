@@ -20,6 +20,7 @@ import { MinimapPoint, MinimapBackdrop, MinimapFrame, MinimapLogic } from './com
 import { UIViewportText, UIWorldText } from './components/ui';
 import EventTrigger from './components/eventTrigger';
 import { makeBuilding, makeMinimap } from './entityFactory';
+import { VIEWPORT_JUMP } from './events';
 
 
 export default class World {
@@ -40,7 +41,7 @@ export default class World {
   minimapUISystem: MinimapUISystem;
   uiSystem: UISystem;
 
-  constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
+  constructor({ main }: { main: HTMLElement }) {
     this.viewport = new Viewport({
       width: SCENE_WIDTH,
       height: SCENE_HEIGHT
@@ -48,10 +49,11 @@ export default class World {
       width: VIEWPORT_WIDTH,
       height: VIEWPORT_HEIGHT,
     }, main);
+    window.canvas = main;
     this.tick = 0;
     window.viewport = this.viewport;
     this.region = new Region(this, main, this.viewport);
-    this.minimap = new Minimap(this, minimap, this.viewport);
+    // this.minimap = new Minimap(this, this.viewport);
     this.time = 1;
     this.speed = 1;
 
@@ -86,7 +88,12 @@ export default class World {
   }
 
   update() {
+    this.manager.on(VIEWPORT_JUMP, (value: Object) => {
+      this.viewport.jump(value.point);
+    });
+    this.manager.update();
     this.viewport.tick();
+    this.manager.update();
     this.eventSystem.update();
     this.displaySystem.update();
     this.uiSystem.update();

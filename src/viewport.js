@@ -57,7 +57,6 @@ export default class Viewport {
   }
 
   handleMouseOut(event: MouseEvent) {
-    console.log('mouse out');
     this.cellHover = null;
     this.panUp(event);
   }
@@ -193,12 +192,12 @@ export default class Viewport {
       x: -coord.x + this.fromZoom(this.viewportSize.width / 2),
       y: -coord.y + this.fromZoom(this.viewportSize.height / 2),
     };
-    console.log('Jump to:', this.offset);
+    // console.log('Jump to:', this.offset);
     this.onMovement();
   }
 
   travel({ x, y }: Point, duration: number = 1000){
-    console.log(`Travel to ${x}, ${y} from ${this.center.x}, ${this.center.y}`);
+    // console.log(`Travel to ${x}, ${y} from ${this.center.x}, ${this.center.y}`);
     const current: Object = this.center;
     const jump = this.jump.bind(this);
     anime({

@@ -12,43 +12,107 @@ export default class EventSystem extends System {
   ];
   viewport: Viewport;
   canvas: HTMLCanvasElement;
+  activeEvents: Array<Event>;
+  mouseMoveComponents: Set<Component>;
 
   constructor(manager: EventManager, viewport: Viewport, canvas: HTMLCanvasElement) {
     super(manager);
     this.viewport = viewport;
     this.canvas = canvas;
+    this.activeEvents = [];
+    this.mouseMoveComponents = new Set();
 
-    this.canvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+    this.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
+    this.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
+    this.canvas.addEventListener('mouseout', this.handleEvent.bind(this));
+    this.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
+    this.canvas.addEventListener('mouseup', this.handleEvent.bind(this));
+  }
+
+  handleEvent(event: Event) {
+    this.activeEvents.push(event);
   }
 
   processEvent(event: MouseEvent, callback: Function) {
     const { offsetX: x, offsetY: y } = event;
-    const point: Point = this.viewport.viewportToWorld(new Point(x, y));
-    this.getComponents().forEach((comp: Component): void => callback(comp, point));
+    const viewportPoint = new Point(x, y);
+    const worldPoint: Point = this.viewport.viewportToWorld(viewportPoint);
+    this.getComponents().forEach((comp: Component): void => callback(comp, viewportPoint, worldPoint));
+  }
+
+  update() {
+    for (const event: Event of this.activeEvents) {
+      switch (event.type) {
+        case 'mousemove':
+          this.handleMouseMove(event);
+        break;
+        case 'mouseout':
+          this.handleMouseOut(event);
+        break;
+        case 'mousedown':
+          this.handleMouseDown(event);
+        break;
+        case 'mouseup':
+          this.handleMouseUp(event);
+        break;
+        default:
+          throw new Error(`Event type ${event.type} is unhandled`);
+      }
+    }
+    this.activeEvents = [];
   }
 
   handleMouseDown(event: MouseEvent) {
-    this.processEvent(event, (comp: Component, point: Point) => {
+    this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
+      if (this.mouseMoveComponents.has(comp) && comp.onMouseDown) {
+        comp.onMouseDown(viewportPoint);
+      }
+
       if (comp.state.bounds) {
-        comp.isClicked = comp.state.bounds.containsPoint(point);
-      } else {
-        comp.isClicked = true;
+        comp.isClicked = comp.state.bounds.containsPoint(worldPoint);
       }
     });
   }
 
-  handleMouseMove(event: MouseEvent) {
+  handleMouseUp(event: MouseEvent) {
     this.processEvent(event, (comp: Component, point: Point) => {
-      if (comp.onMouseMove) {
-        comp.onMouseMove();
+      if (this.mouseMoveComponents.has(comp) && comp.onMouseUp) {
+        comp.onMouseUp(point);
+      }
+    });
+  }
+
+  handleMouseOut(event: MouseEvent) {
+    const { offsetX: x, offsetY: y } = event;
+    const point: Point = this.viewport.viewportToWorld(new Point(x, y));
+    for (const comp of this.mouseMoveComponents) {
+      if (comp.onMouseLeave) {
+        comp.onMouseLeave(point);
+      }
+    }
+  }
+
+  handleMouseMove(event: MouseEvent) {
+    this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
+      const isAtComponent = comp.state.bounds.containsPoint(viewportPoint);
+      // console.log(this.mouseMoveComponents.has(comp), !isAtComponent, !!comp.onMouseLeave);
+      if (this.mouseMoveComponents.has(comp) && !isAtComponent && comp.onMouseLeave) {
+        comp.onMouseLeave();
       }
 
-      if (comp.state.bounds) {
-        const isAtComponent = comp.state.bounds.containsPoint(point);
-        comp.isHover = isAtComponent;
+      if (!this.mouseMoveComponents.has(comp) && isAtComponent && comp.onMouseEnter) {
+        comp.onMouseEnter();
+      }
+
+      if (isAtComponent && comp.onMouseMove) {
+        comp.onMouseMove(viewportPoint);
+        this.mouseMoveComponents.add(comp);
       } else {
-        comp.isHover = true;
+        this.mouseMoveComponents.delete(comp);
+      }
+
+      if (isAtComponent && comp.state.bounds) {
+        comp.isHover = isAtComponent;
       }
     });
   }

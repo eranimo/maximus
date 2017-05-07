@@ -31,7 +31,9 @@ export class Component {
 
   init() {}
   update() {}
-
+  sendEvent(event: GameEvent) {
+    this.entity.manager.emitEvent(event);
+  }
   on(event: GameEvent) {} // eslint-disable-line
 }
 
@@ -102,11 +104,15 @@ export default class EntityManager {
   entities: Array<Entity>;
   componentTypes: Map<string, Class<Component>>;
   componentInstances: Array<$Subtype<Component>>;
+  events: Set<GameEvent>;
+  eventListeners: Map<string, Array<Function>>;
 
   constructor() {
     this.componentTypes = new Map();
     this.componentInstances = [];
     this.entities = [];
+    this.events = new Set();
+    this.eventListeners = new Map();
   }
 
   addEntity(components: { [string]: Object }, name: ?string): Entity {
@@ -148,12 +154,41 @@ export default class EntityManager {
     return components;
   }
 
+  emitEvent(event: GameEvent) {
+    this.events.add(event);
+  }
+
   // update all entities
   update() {
-    for (const entity of this.entities) {
-      for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
-        instance.update();
+    // for (const entity of this.entities) {
+    //   for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
+    //     instance.update();
+    //   }
+    // }
+    if (this.events.size > 0) {
+      for (const event: GameEvent of this.events) {
+        if (this.eventListeners.has(event.name)) {
+          const listeners: ?Array<Function> = this.eventListeners.get(event.name);
+          if (listeners) {
+            for (const listener: Function of listeners) {
+              listener(event.value);
+              this.events.delete(event);
+            }
+          }
+        }
       }
+    }
+    // this.events = new Set();
+  }
+
+  on(eventName: string, listener: Function) {
+    if (this.eventListeners.has(eventName)) {
+      this.eventListeners.set(eventName, [
+        ...this.eventListeners.get(eventName) || [],
+        listener
+      ]);
+    } else {
+      this.eventListeners.set(eventName, [listener]);
     }
   }
 }

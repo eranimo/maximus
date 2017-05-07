@@ -22,20 +22,14 @@ export type Size = {
 window.onload = () => {
   // $FlowFixMe
   const mainCanvas: HTMLElement = document.getElementById('gameCanvas');
-  // $FlowFixMe
-  const minimapCanvas: HTMLElement = document.getElementById('minimapCanvas');
-  if (!mainCanvas || !minimapCanvas) {
+  if (!mainCanvas) {
     throw new Error('Fuck flowtype');
   }
   mainCanvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
   mainCanvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
 
-  minimapCanvas.setAttribute('width', `${MINIMAP_WIDTH}px`);
-  minimapCanvas.setAttribute('height', `${MINIMAP_HEIGHT}px`);
-
   const world: World = new World({
     main: mainCanvas,
-    minimap: minimapCanvas,
   });
   world.loop();
 };
