@@ -4,9 +4,10 @@ import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import type EventTrigger from './eventTrigger';
 import Color from '../utils/color';
+import type RenderComponent from './render';
 
 
-export default class Box extends Component {
+export default class Box extends Component extends RenderComponent {
   state: {
     pos: Point,
     color: Color,
