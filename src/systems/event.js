@@ -10,6 +10,7 @@ export default class EventSystem extends System {
   static componentTypes = [
     EventTrigger,
   ];
+
   viewport: Viewport;
   canvas: HTMLCanvasElement;
   activeEvents: Array<Event>;
@@ -60,6 +61,10 @@ export default class EventSystem extends System {
       }
     }
     this.activeEvents = [];
+
+    for (const comp: Component of this.getComponents()) {
+      comp.update();
+    }
   }
 
   handleMouseDown(event: MouseEvent) {
@@ -67,17 +72,13 @@ export default class EventSystem extends System {
       if (this.mouseMoveComponents.has(comp) && comp.onMouseDown) {
         comp.onMouseDown(viewportPoint);
       }
-
-      if (comp.state.bounds) {
-        comp.isClicked = comp.state.bounds.containsPoint(worldPoint);
-      }
     });
   }
 
   handleMouseUp(event: MouseEvent) {
     this.processEvent(event, (comp: Component, point: Point) => {
       if (this.mouseMoveComponents.has(comp) && comp.onMouseUp) {
-        comp.onMouseUp(point);
+        comp.trigger('onMouseUp', [point]);
       }
     });
   }
@@ -86,9 +87,7 @@ export default class EventSystem extends System {
     const { offsetX: x, offsetY: y } = event;
     const point: Point = this.viewport.viewportToWorld(new Point(x, y));
     for (const comp of this.mouseMoveComponents) {
-      if (comp.onMouseLeave) {
-        comp.onMouseLeave(point);
-      }
+      comp.trigger('onMouseLeave', [point]);
     }
   }
 
@@ -96,23 +95,19 @@ export default class EventSystem extends System {
     this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
       const isAtComponent = comp.state.bounds.containsPoint(viewportPoint);
       // console.log(this.mouseMoveComponents.has(comp), !isAtComponent, !!comp.onMouseLeave);
-      if (this.mouseMoveComponents.has(comp) && !isAtComponent && comp.onMouseLeave) {
-        comp.onMouseLeave();
+      if (this.mouseMoveComponents.has(comp) && !isAtComponent) {
+        comp.trigger('onMouseLeave', [worldPoint]);
       }
 
-      if (!this.mouseMoveComponents.has(comp) && isAtComponent && comp.onMouseEnter) {
-        comp.onMouseEnter();
+      if (!this.mouseMoveComponents.has(comp) && isAtComponent) {
+        comp.trigger('onMouseEnter', [worldPoint]);
       }
 
-      if (isAtComponent && comp.onMouseMove) {
-        comp.onMouseMove(viewportPoint);
+      if (isAtComponent) {
+        comp.trigger('onMouseMove', [viewportPoint]);
         this.mouseMoveComponents.add(comp);
       } else {
         this.mouseMoveComponents.delete(comp);
-      }
-
-      if (isAtComponent && comp.state.bounds) {
-        comp.isHover = isAtComponent;
       }
     });
   }

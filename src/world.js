@@ -14,7 +14,7 @@ import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 
-import Box from './components/box';
+import Box, { BoxTrigger } from './components/box';
 import { MinimapPoint, MinimapBackdrop, MinimapFrame, MinimapLogic } from './components/minimap';
 import { UIViewportText, UIWorldText } from './components/ui';
 import EventTrigger from './components/eventTrigger';
@@ -28,7 +28,6 @@ export default class World {
 
   viewport: Viewport;
   region: Region;
-  minimap: Minimap;
   tick: number;
   time: number;
   speed: number;
@@ -59,9 +58,9 @@ export default class World {
 
     this.manager.registerComponents([
       ['box', Box],
+      ['boxTrigger', BoxTrigger],
       ['viewportText', UIViewportText],
       ['worldText', UIWorldText],
-      ['eventTrigger', EventTrigger],
       ['minimapPoint', MinimapPoint],
       ['minimapBackdrop', MinimapBackdrop],
       ['minimapFrame', MinimapFrame],

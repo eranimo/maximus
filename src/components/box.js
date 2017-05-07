@@ -2,7 +2,7 @@ import { Component } from '../entityManager';
 import Point from '../geometry/point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
-import type EventTrigger from './eventTrigger';
+import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
 import type RenderComponent from './render';
 
@@ -52,16 +52,23 @@ export default class Box extends Component implements RenderComponent {
     }
     return null;
   }
+}
 
-  update() {
-    const eventTrigger: EventTrigger = this.entity.getComponent('eventTrigger');
 
-    this.state.opacity = eventTrigger.isHover ? 0.5 : 1;
+export class BoxTrigger extends EventTrigger {
+  get box(): Box {
+    return this.entity.getComponent('box');
+  }
 
-    if (eventTrigger.isClicked) {
-      this.state.color = Color.random();
-      eventTrigger.isClicked = false;
-    }
+  onMouseEnter() {
+    this.box.state.opacity = 0.5;
+  }
 
+  onMouseLeave() {
+    this.box.state.opacity = 1;
+  }
+
+  onMouseUp() {
+    this.box.state.color = Color.random();
   }
 }

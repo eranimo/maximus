@@ -46,7 +46,7 @@ export function makeBuilding(manager: EntityManager, pos: Point, name: ?string):
       text: 'foobar',
       position: pos,
     },
-    eventTrigger: {
+    boxTrigger: {
       bounds: new Rectangle(pos.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE)
     }
   }, name);

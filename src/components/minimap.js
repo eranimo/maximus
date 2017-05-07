@@ -64,6 +64,11 @@ export class MinimapLogic extends EventTrigger {
     });
   }
 
+  onMouseLeave() {
+    this.state.isPanning = false;
+    window.canvas.style.cursor = 'crosshair';
+  }
+
   onMouseUp() {
     this.state.isPanning = false;
     window.canvas.style.cursor = 'crosshair';
@@ -75,7 +80,6 @@ export class MinimapLogic extends EventTrigger {
       x: Math.round(((point.x - bounds.position.x) / MINIMAP_WIDTH) * SCENE_WIDTH),
       y: Math.round(((point.y - bounds.position.y) / MINIMAP_HEIGHT) * SCENE_HEIGHT),
     });
-    console.log(worldPoint);
     if (this.state.isPanning) {
       this.sendEvent({
         name: VIEWPORT_JUMP,
