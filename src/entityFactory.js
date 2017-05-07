@@ -17,11 +17,11 @@ export function makeMinimap(manager: EntityManager): Entity {
     minimapLogic: {
       bounds: new Rectangle(
         new Point(
-          window.innerWidth - MINIMAP_WIDTH - 2,
-          window.innerHeight - MINIMAP_HEIGHT - 2,
+          window.innerWidth - MINIMAP_WIDTH,
+          window.innerHeight - MINIMAP_HEIGHT,
         ),
-        MINIMAP_WIDTH,
-        MINIMAP_HEIGHT
+        MINIMAP_WIDTH + 2,
+        MINIMAP_HEIGHT + 2
       )
     }
   }, 'minimap');
