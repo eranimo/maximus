@@ -3,7 +3,7 @@ import Point from '../geometry/point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import type EventTrigger from './eventTrigger';
-import Color from '../color';
+import Color from '../utils/color';
 
 
 export default class Box extends Component {

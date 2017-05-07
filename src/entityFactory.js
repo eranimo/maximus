@@ -2,7 +2,7 @@ import EntityManager, { Entity } from './entityManager';
 import Rectangle from './geometry/rectangle';
 import Point from './geometry/point';
 import { CELL_SIZE } from './constants';
-import Color from './color';
+import Color from './utils/color';
 
 
 export function makeMinimap(manager: EntityManager): Entity {
