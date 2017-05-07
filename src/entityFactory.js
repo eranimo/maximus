@@ -25,7 +25,7 @@ export function makeBuilding(manager: EntityManager, pos: Point, name: ?string):
     },
     worldText: {
       font: 'sans-serif',
-      size: 12,
+      size: 7,
       color: '#C0C0C0',
       shadow: true,
       text: 'foobar',

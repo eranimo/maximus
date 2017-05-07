@@ -55,11 +55,7 @@ export default class Box extends Component {
   update() {
     const eventTrigger: EventTrigger = this.entity.getComponent('eventTrigger');
 
-    if (eventTrigger.isHover) {
-      this.state.opacity = 0.5;
-    } else {
-      this.state.opacity = 1;
-    }
+    this.state.opacity = eventTrigger.isHover ? 0.5 : 1;
 
     if (eventTrigger.isClicked) {
       this.state.color = Color.random();
