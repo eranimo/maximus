@@ -1,6 +1,6 @@
 //@flow
 import type { Size } from './index';
-import type Point from './point';
+import Point from './point';
 import anime from 'animejs';
 import _ from 'lodash';
 import {
@@ -257,18 +257,18 @@ export default class Viewport {
   }
 
   worldToViewport(coord: Point): Point {
-    return {
+    return new Point({
       x: this.toZoom(this.offset.x + coord.x),
       y: this.toZoom(this.offset.y + coord.y),
-    };
+    });
   }
 
   // convert viewport coordinates to world coordinates
   viewportToWorld(coord: Point): Point {
-    return {
+    return new Point({
       x: this.fromZoom(coord.x) - this.offset.x,
       y: this.fromZoom(coord.y) - this.offset.y,
-    };
+    });
   }
 
   // is viewport coordinate in viewport

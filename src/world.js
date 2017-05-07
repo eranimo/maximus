@@ -11,11 +11,14 @@ import {
 import EntityManager from './entityManager';
 import Point from './point';
 import DisplaySystem from './systems/display';
+import MinimapUISystem from './systems/minimapUI';
+import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 
 import Box from './components/box';
 import { MinimapPoint, MinimapBackdrop, MinimapFrame } from './components/minimap';
-
+import { UIViewportText, UIWorldText } from './components/ui';
+import EventTrigger from './components/eventTrigger';
 import { makeBuilding, makeMinimap } from './entityFactory';
 
 
@@ -31,8 +34,11 @@ export default class World {
   speed: number;
 
   manager: EntityManager;
+
+  eventSystem: EventSystem;
   displaySystem: DisplaySystem;
-  uiSystem: DisplaySystem;
+  minimapUISystem: MinimapUISystem;
+  uiSystem: UISystem;
 
   constructor({ minimap, main }: { minimap: HTMLElement, main: HTMLElement }) {
     this.viewport = new Viewport({
@@ -50,27 +56,38 @@ export default class World {
     this.speed = 1;
 
     this.manager = new EntityManager();
-    this.manager.registerComponent('display', Box);
+
+    this.manager.registerComponent('box', Box);
+    this.manager.registerComponent('viewportText', UIViewportText);
+    this.manager.registerComponent('worldText', UIWorldText);
+    this.manager.registerComponent('eventTrigger', EventTrigger);
     this.manager.registerComponent('minimapPoint', MinimapPoint);
     this.manager.registerComponent('minimapBackdrop', MinimapBackdrop);
     this.manager.registerComponent('minimapFrame', MinimapFrame);
-    this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
-    this.uiSystem = new UISystem(this.manager, this.viewport, this.minimap.ctx);
 
-    makeBuilding(this.manager, new Point(10, 10), 'b1');
+    this.eventSystem = new EventSystem(this.manager, this.viewport, this.region.canvas);
+    this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
+    this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.minimap.ctx);
+    this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
+
+    const building: any = makeBuilding(this.manager, new Point(10, 10), 'b1');
     makeMinimap(this.manager);
+    console.log(building);
   }
 
   draw(timeSinceLastUpdate: number) {
     this.region.draw(timeSinceLastUpdate);
     this.displaySystem.draw();
     this.uiSystem.draw();
+    this.minimapUISystem.draw();
   }
 
   update() {
     this.viewport.tick();
+    this.eventSystem.update();
     this.displaySystem.update();
     this.uiSystem.update();
+    this.minimapUISystem.update();
     this.tick++;
   }
 

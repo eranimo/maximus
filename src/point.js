@@ -7,5 +7,28 @@ export default class Point {
       this.x = x.x;
       this.y = x.y;
     }
+
+    Object.freeze(this);
+  }
+
+  add(amount: number): Point {
+    return new Point(
+      this.x + amount,
+      this.y + amount,
+    );
+  }
+
+  divide(amount: number): Point {
+    return new Point(
+      this.x / amount,
+      this.y / amount,
+    );
+  }
+
+  multiply(amount: number): Point {
+    return new Point(
+      this.x * amount,
+      this.y * amount,
+    );
   }
 }

@@ -77,9 +77,7 @@ export class System {
     return foundComponents;
   }
 
-  update() {
-    throw new Error('Not implemented');
-  }
+  update() {}
 }
 
 export default class EntityManager {

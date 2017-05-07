@@ -88,7 +88,7 @@ export default class Region {
     if (viewport.cellHover){
       ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
     }
-    ctx.fillText(`FPS: (${timeSinceLastUpdate})`, 0, 6 * 20);
+    ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
     ctx.fillText(`Time Δ (s): (${Math.round(this.world.time / 1000)})`, 0, 7 * 20);
 
 

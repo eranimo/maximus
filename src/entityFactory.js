@@ -1,5 +1,9 @@
 import EntityManager, { Entity } from './entityManager';
+import Rectangle from './rectangle';
 import Point from './point';
+import { CELL_SIZE } from './constants';
+import Color from './color';
+
 
 export function makeMinimap(manager: EntityManager): Entity {
   return manager.addEntity({
@@ -10,13 +14,25 @@ export function makeMinimap(manager: EntityManager): Entity {
 
 export function makeBuilding(manager: EntityManager, pos: Point, name: ?string): Entity {
   return manager.addEntity({
-    display: {
+    box: {
       pos,
-      color: 'blue',
+      color: new Color(0, 0, 255),
+      opacity: 1,
     },
     minimapPoint: {
       pos,
       color: 'blue',
+    },
+    worldText: {
+      font: 'sans-serif',
+      size: 12,
+      color: '#C0C0C0',
+      shadow: true,
+      text: 'foobar',
+      position: pos,
+    },
+    eventTrigger: {
+      bounds: new Rectangle(pos.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE)
     }
   }, name);
 }

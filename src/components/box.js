@@ -2,16 +2,20 @@ import { Component } from '../entityManager';
 import Point from '../point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
+import type EventTrigger from './eventTrigger';
+import Color from '../color';
+
 
 export default class Box extends Component {
   state: {
     pos: Point,
-    color: string,
+    color: Color,
+    opacity: number,
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { color, pos: { x, y } } = this.state;
-    ctx.fillStyle = color;
+    const { color, opacity, pos: { x, y } } = this.state;
+    ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
 
     const intersect = this.calculateBounds(
       viewport,
@@ -46,5 +50,21 @@ export default class Box extends Component {
       return { topLeft, width: newWidth, height: newHeight };
     }
     return null;
+  }
+
+  update() {
+    const eventTrigger: EventTrigger = this.entity.getComponent('eventTrigger');
+
+    if (eventTrigger.isHover) {
+      this.state.opacity = 0.5;
+    } else {
+      this.state.opacity = 1;
+    }
+
+    if (eventTrigger.isClicked) {
+      this.state.color = Color.random();
+      eventTrigger.isClicked = false;
+    }
+
   }
 }
