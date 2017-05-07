@@ -1,7 +1,6 @@
 // @flow
 import Viewport from './viewport';
 import Region from './region';
-import Minimap from './minimap';
 import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
@@ -53,7 +52,6 @@ export default class World {
     this.tick = 0;
     window.viewport = this.viewport;
     this.region = new Region(this, main, this.viewport);
-    // this.minimap = new Minimap(this, this.viewport);
     this.time = 1;
     this.speed = 1;
 
