@@ -14,14 +14,19 @@ System:
   - a function that gets entities with certain components and does something with them
 
 */
+
+let currentID = 0;
+
 export class Component {
+  id: number;
   entity: Entity;
   state: Object;
 
   constructor(entity: Entity, state: Object) {
     this.entity = entity;
     this.state = state;
-    this.init();
+    this.id = currentID;
+    currentID++;
   }
 
   init() {}
@@ -67,12 +72,23 @@ export class System {
 
   constructor(manager: EntityManager) {
     this.manager = manager;
+
+    console.log(
+      `Registered system ${this.constructor.name} with ${this.constructor.componentTypes.length} components\n`,
+      this.constructor.componentTypes.map((c: Class<$Subtype<Component>>): string => {
+        return `\t- ${c.name}`;
+      }).join('\n')
+    );
   }
 
   getComponents(): Array<$Subtype<Component>> {
     let foundComponents: Array<$Subtype<Component>> = [];
     for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
-      foundComponents.push(...this.manager.componentInstancesMap.get(type) || []);
+      for (const comp: $Subtype<Component> of this.manager.componentInstances) {
+        if (comp instanceof type) {
+          foundComponents.push(comp);
+        }
+      }
     }
     return foundComponents;
   }
@@ -83,11 +99,11 @@ export class System {
 export default class EntityManager {
   entities: Array<Entity>;
   componentTypes: Map<string, Class<Component>>;
-  componentInstancesMap: Map<Class<$Subtype<Component>>, Array<$Subtype<Component>>>;
+  componentInstances: Array<$Subtype<Component>>;
 
   constructor() {
     this.componentTypes = new Map();
-    this.componentInstancesMap = new Map();
+    this.componentInstances = [];
     this.entities = [];
   }
 
@@ -97,12 +113,12 @@ export default class EntityManager {
       const _class: ?Class<Component> = this.componentTypes.get(identifier);
       if (_class) {
         const component: Component = new _class(entity, state);
-        this.componentInstancesMap.set(_class, [
-          ...this.componentInstancesMap.get(_class) || [],
-          component,
-        ]);
+        this.componentInstances.push(component);
         entity.addComponent(identifier, component);
       }
+    }
+    for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
+      instance.init();
     }
     this.entities.push(entity);
     return entity;
