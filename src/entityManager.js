@@ -112,6 +112,12 @@ export default class EntityManager {
     this.componentTypes.set(name, component);
   }
 
+  registerComponents(list: Array<Array<any>>) {
+    for (const [name, component] of list) {
+      this.registerComponent(name, component);
+    }
+  }
+
   getComponents(identifier: string): Array<Component> {
     const components: Array<Component> = [];
     for (const entity of this.entities) {

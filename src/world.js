@@ -57,13 +57,15 @@ export default class World {
 
     this.manager = new EntityManager();
 
-    this.manager.registerComponent('box', Box);
-    this.manager.registerComponent('viewportText', UIViewportText);
-    this.manager.registerComponent('worldText', UIWorldText);
-    this.manager.registerComponent('eventTrigger', EventTrigger);
-    this.manager.registerComponent('minimapPoint', MinimapPoint);
-    this.manager.registerComponent('minimapBackdrop', MinimapBackdrop);
-    this.manager.registerComponent('minimapFrame', MinimapFrame);
+    this.manager.registerComponents([
+      ['box', Box],
+      ['viewportText', UIViewportText],
+      ['worldText', UIWorldText],
+      ['eventTrigger', EventTrigger],
+      ['minimapPoint', MinimapPoint],
+      ['minimapBackdrop', MinimapBackdrop],
+      ['minimapFrame', MinimapFrame],
+    ]);
 
     this.eventSystem = new EventSystem(this.manager, this.viewport, this.region.canvas);
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
