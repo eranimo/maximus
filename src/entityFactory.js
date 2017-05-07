@@ -15,6 +15,7 @@ export function makeMinimap(manager: EntityManager): Entity {
     minimapFrame: {},
     minimapBackdrop: {},
     minimapLogic: {
+      type: 'viewport',
       bounds: new Rectangle(
         new Point(
           window.innerWidth - MINIMAP_WIDTH,
@@ -47,6 +48,7 @@ export function makeBuilding(manager: EntityManager, pos: Point, name: ?string):
       position: pos,
     },
     boxTrigger: {
+      type: 'world',
       bounds: new Rectangle(pos.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE)
     }
   }, name);

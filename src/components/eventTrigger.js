@@ -4,7 +4,8 @@ import Rectangle from '../geometry/rectangle';
 
 export default class EventTrigger extends Component {
   state: {
-    bounds: Rectangle
+    bounds: Rectangle,
+    type: viewport | world
   };
   callbacks: Map<string, Array<Array<any>>>;
 
@@ -16,7 +17,7 @@ export default class EventTrigger extends Component {
   trigger(eventName: string, args: Array<any>) {
     this.callbacks.set(eventName, [
       ...this.callbacks.get(eventName) || [],
-      [args]
+      args
     ]);
   }
 

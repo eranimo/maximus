@@ -93,18 +93,18 @@ export default class EventSystem extends System {
 
   handleMouseMove(event: MouseEvent) {
     this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
-      const isAtComponent = comp.state.bounds.containsPoint(viewportPoint);
-      // console.log(this.mouseMoveComponents.has(comp), !isAtComponent, !!comp.onMouseLeave);
+      const whichPoint = comp.state.type === 'viewport' ? viewportPoint : worldPoint;
+      const isAtComponent = comp.state.bounds.containsPoint(whichPoint);
       if (this.mouseMoveComponents.has(comp) && !isAtComponent) {
-        comp.trigger('onMouseLeave', [worldPoint]);
+        comp.trigger('onMouseLeave', [whichPoint]);
       }
 
       if (!this.mouseMoveComponents.has(comp) && isAtComponent) {
-        comp.trigger('onMouseEnter', [worldPoint]);
+        comp.trigger('onMouseEnter', [whichPoint]);
       }
 
       if (isAtComponent) {
-        comp.trigger('onMouseMove', [viewportPoint]);
+        comp.trigger('onMouseMove', [whichPoint]);
         this.mouseMoveComponents.add(comp);
       } else {
         this.mouseMoveComponents.delete(comp);

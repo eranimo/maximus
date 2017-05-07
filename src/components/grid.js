@@ -19,5 +19,5 @@ export class Grid extends Component {
 
 // all entities that occupy a space on the grid have a GridCell component
 export default class GridCell extends EventTrigger {
-  
+  position: Point
 }
