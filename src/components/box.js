@@ -7,7 +7,7 @@ import Color from '../utils/color';
 import type RenderComponent from './render';
 
 
-export default class Box extends Component extends RenderComponent {
+export default class Box extends Component implements RenderComponent {
   state: {
     pos: Point,
     color: Color,
