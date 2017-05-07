@@ -1,7 +1,7 @@
 import { System } from '../entityManager';
 import type EventManager from '../entityManager';
 import EventTrigger from '../components/eventTrigger';
-import Point from '../point';
+import Point from '../geometry/point';
 import Viewport from '../viewport';
 
 

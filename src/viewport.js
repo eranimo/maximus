@@ -1,6 +1,6 @@
 //@flow
 import type { Size } from './index';
-import Point from './point';
+import Point from './geometry/point';
 import anime from 'animejs';
 import _ from 'lodash';
 import {

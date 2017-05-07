@@ -1,5 +1,5 @@
 import { Component } from '../entityManager';
-import Point from '../point';
+import Point from '../geometry/point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import type EventTrigger from './eventTrigger';

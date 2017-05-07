@@ -9,7 +9,7 @@ import {
   VIEWPORT_HEIGHT,
 } from './constants';
 import EntityManager from './entityManager';
-import Point from './point';
+import Point from './geometry/point';
 import DisplaySystem from './systems/display';
 import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';

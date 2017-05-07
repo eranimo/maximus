@@ -1,6 +1,6 @@
 //@flow
 import type Viewport from './viewport';
-import Point from './point';
+import Point from './geometry/point';
 import type World from './world';
 import _ from 'lodash';
 import {

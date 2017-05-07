@@ -1,5 +1,5 @@
 import { Component } from '../entityManager';
-import Rectangle from '../rectangle';
+import Rectangle from '../geometry/rectangle';
 
 
 export default class EventTrigger extends Component {

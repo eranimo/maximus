@@ -1,6 +1,6 @@
 import EntityManager, { Entity } from './entityManager';
-import Rectangle from './rectangle';
-import Point from './point';
+import Rectangle from './geometry/rectangle';
+import Point from './geometry/point';
 import { CELL_SIZE } from './constants';
 import Color from './color';
 
