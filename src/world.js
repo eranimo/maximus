@@ -14,9 +14,6 @@ import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 
-import Box, { BoxTrigger } from './components/box';
-import { MinimapPoint, MinimapBackdrop, MinimapFrame, MinimapLogic } from './components/minimap';
-import { UIViewportText, UIWorldText } from './components/ui';
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
 import Minimap from './entities/minimap';
@@ -56,18 +53,7 @@ export default class World {
 
     this.manager = new EntityManager();
 
-    this.manager.registerComponents([
-      ['box', Box],
-      ['boxTrigger', BoxTrigger],
-      ['viewportText', UIViewportText],
-      ['worldText', UIWorldText],
-      ['minimapPoint', MinimapPoint],
-      ['minimapBackdrop', MinimapBackdrop],
-      ['minimapFrame', MinimapFrame],
-      ['minimapLogic', MinimapLogic],
-    ]);
-
-    this.eventSystem = new EventSystem(this.manager, this.viewport, this.region.canvas);
+    this.eventSystem = new EventSystem(this.manager, this.viewport, (this.region.canvas: any));
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
     this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
     this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
@@ -78,6 +64,7 @@ export default class World {
     });
 
     this.manager.addEntity(Minimap);
+    window.manager = this.manager;
   }
 
   draw(timeSinceLastUpdate: number) {

@@ -1,3 +1,4 @@
+// @flow
 import { Component } from '../entityManager';
 import {
   SCENE_CELLS_WIDTH,
@@ -7,23 +8,26 @@ import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
 } from '../constants';
-import type RenderComponent from './render';
 import EventTrigger from './eventTrigger';
 import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
 import { VIEWPORT_JUMP } from '../events';
+import type Viewport from '../viewport';
 
 
 // renders a point on the minimap
-export class MinimapPoint extends Component implements RenderComponent {
+export class MinimapPoint extends Component {
   state: {
-    pos: Point,
+    position: Point,
     color: string,
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { color, pos: { x, y } } = this.state;
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('minimapLogic')[0];
+    const { color, position: { x, y } } = this.state;
+    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+    if (!logic) {
+      throw new Error('Could not find MinimapLogic component');
+    }
     const { bounds } = logic.state;
 
     ctx.beginPath();
@@ -43,10 +47,6 @@ export class MinimapLogic extends EventTrigger {
     isPanning: boolean,
     bounds: Rectangle
   };
-
-  init() {
-    this.state.isPanning = false;
-  }
 
   onMouseDown(point: Point) {
     this.state.isPanning = true;
@@ -93,9 +93,12 @@ export class MinimapLogic extends EventTrigger {
 }
 
 // background of the minimap
-export class MinimapBackdrop extends Component implements RenderComponent {
+export class MinimapBackdrop extends Component {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('minimapLogic')[0];
+    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+    if (!logic) {
+      throw new Error('Could not find MinimapLogic component');
+    }
     const { bounds } = logic.state;
     ctx.beginPath();
     ctx.fillStyle = 'white';
@@ -113,9 +116,12 @@ export class MinimapBackdrop extends Component implements RenderComponent {
 }
 
 // minimap frame that represent's the viewport's current view
-export class MinimapFrame extends Component implements RenderComponent {
+export class MinimapFrame extends Component {
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('minimapLogic')[0];
+    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+    if (!logic) {
+      throw new Error('Could not find MinimapLogic component');
+    }
     const { bounds } = logic.state;
 
     ctx.save();

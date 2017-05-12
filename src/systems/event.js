@@ -1,5 +1,6 @@
+// @flow
 import { System } from '../entityManager';
-import type EventManager from '../entityManager';
+import type EventManager, { ComponentClass } from '../entityManager';
 import EventTrigger from '../components/eventTrigger';
 import Point from '../geometry/point';
 import Viewport from '../viewport';
@@ -14,7 +15,7 @@ export default class EventSystem extends System {
   viewport: Viewport;
   canvas: HTMLCanvasElement;
   activeEvents: Array<Event>;
-  mouseMoveComponents: Set<Component>;
+  mouseMoveComponents: Set<ComponentClass>;
 
   constructor(manager: EventManager, viewport: Viewport, canvas: HTMLCanvasElement) {
     super(manager);
@@ -38,23 +39,23 @@ export default class EventSystem extends System {
     const { offsetX: x, offsetY: y } = event;
     const viewportPoint = new Point(x, y);
     const worldPoint: Point = this.viewport.viewportToWorld(viewportPoint);
-    this.getComponents().forEach((comp: Component): void => callback(comp, viewportPoint, worldPoint));
+    this.getComponents().forEach((comp: ComponentClass): void => callback(comp, viewportPoint, worldPoint));
   }
 
   update() {
     for (const event: Event of this.activeEvents) {
       switch (event.type) {
         case 'mousemove':
-          this.handleMouseMove(event);
+          this.handleMouseMove((event: any));
         break;
         case 'mouseout':
-          this.handleMouseOut(event);
+          this.handleMouseOut((event: any));
         break;
         case 'mousedown':
-          this.handleMouseDown(event);
+          this.handleMouseDown((event: any));
         break;
         case 'mouseup':
-          this.handleMouseUp(event);
+          this.handleMouseUp((event: any));
         break;
         default:
           throw new Error(`Event type ${event.type} is unhandled`);
@@ -62,13 +63,13 @@ export default class EventSystem extends System {
     }
     this.activeEvents = [];
 
-    for (const comp: Component of this.getComponents()) {
+    for (const comp: ComponentClass of this.getComponents()) {
       comp.update();
     }
   }
 
   handleMouseDown(event: MouseEvent) {
-    this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
+    this.processEvent(event, (comp: ComponentClass, viewportPoint: Point, worldPoint: Point) => {
       if (this.mouseMoveComponents.has(comp) && comp.onMouseDown) {
         comp.onMouseDown(viewportPoint);
       }
@@ -76,7 +77,7 @@ export default class EventSystem extends System {
   }
 
   handleMouseUp(event: MouseEvent) {
-    this.processEvent(event, (comp: Component, point: Point) => {
+    this.processEvent(event, (comp: ComponentClass, point: Point) => {
       if (this.mouseMoveComponents.has(comp) && comp.onMouseUp) {
         comp.trigger('onMouseUp', [point]);
       }
@@ -92,7 +93,7 @@ export default class EventSystem extends System {
   }
 
   handleMouseMove(event: MouseEvent) {
-    this.processEvent(event, (comp: Component, viewportPoint: Point, worldPoint: Point) => {
+    this.processEvent(event, (comp: ComponentClass, viewportPoint: Point, worldPoint: Point) => {
       const whichPoint = comp.state.type === 'viewport' ? viewportPoint : worldPoint;
       const isAtComponent = comp.state.bounds.containsPoint(whichPoint);
       if (this.mouseMoveComponents.has(comp) && !isAtComponent) {

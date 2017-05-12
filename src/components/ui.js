@@ -6,16 +6,16 @@ import { CELL_SIZE } from '../constants';
 
 
 // text rendered onto the UI space
-export class UIViewportText extends Component implements RenderComponent {
+export class ViewportText extends Component implements RenderComponent {
   state: {
-    pos: Point,
+    position: Point,
     text: string,
     font: string,
     color: string,
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { pos: { x, y}, text, color, font } = this.state;
+    const { position: { x, y}, text, color, font } = this.state;
     ctx.font = font;
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
@@ -23,7 +23,7 @@ export class UIViewportText extends Component implements RenderComponent {
 }
 
 // text rendered onto the world space (inside the viewport)
-export class UIWorldText extends Component implements RenderComponent {
+export class WorldText extends Component implements RenderComponent {
   state: {
     position: Point,
     text: string,

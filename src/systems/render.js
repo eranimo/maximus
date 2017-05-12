@@ -1,6 +1,7 @@
+// @flow
 import { System } from '../entityManager';
 import type Viewport from '../viewport';
-import type EntityManager from '../entityManager';
+import type EntityManager, { ComponentClass } from '../entityManager';
 
 
 // base class for any System that handles RenderComponents
@@ -15,13 +16,13 @@ export default class RenderSystem extends System {
   }
 
   update() {
-    for (const comp: $Subtype<Component> of this.getComponents()) {
+    for (const comp: ComponentClass of this.getComponents()) {
       comp.update();
     }
   }
 
   draw() {
-    this.getComponents().forEach((comp: Component) => {
+    this.getComponents().forEach((comp: ComponentClass) => {
       comp.draw(this.viewport, this.ctx);
     });
   }

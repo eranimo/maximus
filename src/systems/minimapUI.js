@@ -1,4 +1,4 @@
-import type { Component } from '../entityManager';
+// @flow
 import { MinimapPoint, MinimapBackdrop, MinimapFrame } from '../components/minimap';
 import RenderSystem from './render';
 

@@ -22,9 +22,10 @@ export class Component {
   entity: Entity;
   state: Object;
 
-  constructor(entity: Entity, state: Object) {
-    this.entity = entity;
-    this.state = state;
+  static initialState = {};
+
+  constructor(options: Object = {}) {
+    this.state = Object.assign({}, this.constructor.initialState, options);
     this.id = currentID;
     currentID++;
   }
@@ -40,35 +41,33 @@ export class Component {
 export class Entity {
   name: ?string;
   manager: EntityManager;
-  components: Map<string, $Subtype<Component>>;
+  components: Array<ComponentClass>;
 
   constructor(name: ?string) {
     this.name = name;
-    this.components = new Map();
+    this.components = [];
   }
 
-  addComponent(identifier: string, instance: $Subtype<Component>) {
-    this.components.set(identifier, instance);
+  addComponent(instance: ComponentClass) {
+    this.components.push(instance);
   }
 
-  getComponent(identifier: string): ?$Subtype<Component> {
-    return this.components.get(identifier);
+  getComponents(identifier: string): Array<ComponentClass> {
+    return this.components.filter((comp: Component): boolean => comp.constructor.name === identifier);
   }
 
-  export(): Object {
-    const data = {};
-    for (const [identifier, instance]: [string, Component] of this.components.entries()) {
-      data[identifier] = instance.state;
-    }
-    return data;
-  }
+  // export(): Object {
+  //   const data = {};
+  //   for (const [identifier, instance]: [string, Component] of this.components.entries()) {
+  //     data[identifier] = instance.state;
+  //   }
+  //   return data;
+  // }
 }
 
-type Config = { [string]: Object };
 
 export interface EntityType {
-  name: string,
-  components(options: { [string]: any }): Config,
+  components(options: { [string]: any }): $Subtype<Component>,
 }
 
 export type GameEvent = {
@@ -78,24 +77,24 @@ export type GameEvent = {
 
 export class System {
   manager: EntityManager;
-  static componentTypes: Array<Class<$Subtype<Component>>> = [];
+  static componentTypes: Array<Class<ComponentClass>> = [];
 
   constructor(manager: EntityManager) {
     this.manager = manager;
 
     console.log(
       `Registered system ${this.constructor.name} with ${this.constructor.componentTypes.length} components\n`,
-      this.constructor.componentTypes.map((c: Class<$Subtype<Component>>): string => {
+      this.constructor.componentTypes.map((c: Class<ComponentClass>): string => {
         return `\t- ${c.name}`;
       }).join('\n')
     );
   }
 
   // gets the components this system cares about
-  getComponents(): Array<$Subtype<Component>> {
-    let foundComponents: Array<$Subtype<Component>> = [];
-    for (const type: Class<$Subtype<Component>> of this.constructor.componentTypes) {
-      for (const comp: $Subtype<Component> of this.manager.componentInstances) {
+  getComponents(): Array<ComponentClass> {
+    let foundComponents: Array<ComponentClass> = [];
+    for (const type: Class<ComponentClass> of this.constructor.componentTypes) {
+      for (const comp: ComponentClass of this.manager.componentInstances) {
         if (comp instanceof type) {
           foundComponents.push(comp);
         }
@@ -107,15 +106,15 @@ export class System {
   update() {}
 }
 
+export type ComponentClass = $Subtype<Component>;
+
 export default class EntityManager {
   entities: Array<Entity>;
-  componentTypes: Map<string, Class<Component>>;
-  componentInstances: Array<$Subtype<Component>>;
+  componentInstances: Array<ComponentClass>;
   events: Set<GameEvent>;
   eventListeners: Map<string, Array<Function>>;
 
   constructor() {
-    this.componentTypes = new Map();
     this.componentInstances = [];
     this.entities = [];
     this.events = new Set();
@@ -125,15 +124,10 @@ export default class EntityManager {
   addEntity(entityType: Object, options: Object = {}): Entity {
     const entity: Entity = new Entity(entityType.name);
     const components = entityType.components(options);
-    for (const [identifier, state]: [string, any] of Object.entries(components)) {
-      const _class: ?Class<Component> = this.componentTypes.get(identifier);
-      if (_class) {
-        const component: Component = new _class(entity, state);
-        this.componentInstances.push(component);
-        entity.addComponent(identifier, component);
-      }
-    }
-    for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
+    this.componentInstances.push(...components);
+    entity.components = components;
+    for (const instance: $Subtype<Component> of components) {
+      instance.entity = entity;
       instance.init();
     }
     entity.manager = this;
@@ -141,23 +135,12 @@ export default class EntityManager {
     return entity;
   }
 
-  registerComponent(name: string, component: Class<Component>) {
-    this.componentTypes.set(name, component);
-  }
-
-  registerComponents(list: Array<Array<any>>) {
-    for (const [name, component] of list) {
-      this.registerComponent(name, component);
-    }
-  }
-
-  getComponents(identifier: string): Array<Component> {
+  // TODO: ideally this shouldn't exist
+  getComponents(identifier: string): Array<ComponentClass> {
     const components: Array<Component> = [];
     for (const entity of this.entities) {
-      const comp: ?Component = entity.getComponent(identifier);
-      if (comp) {
-        components.push(comp);
-      }
+      const comps: Array<Component> = entity.getComponents(identifier);
+      components.push(...comps);
     }
     return components;
   }

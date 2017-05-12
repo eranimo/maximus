@@ -1,5 +1,6 @@
+// @flow
 import RenderSystem from './render';
-import Box from '../components/box';
+import { Box } from '../components/box';
 
 
 // a system that displays all world entities

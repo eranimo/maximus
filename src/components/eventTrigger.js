@@ -1,12 +1,8 @@
+// @flow
 import { Component } from '../entityManager';
-import Rectangle from '../geometry/rectangle';
 
 
 export default class EventTrigger extends Component {
-  state: {
-    bounds: Rectangle,
-    type: viewport | world
-  };
   callbacks: Map<string, Array<Array<any>>>;
 
   constructor() {
@@ -24,7 +20,9 @@ export default class EventTrigger extends Component {
   update() {
     for (const [eventName, argsList]: [string, Array<Array<any>>] of this.callbacks.entries()) {
       for (const args: Array<any> of argsList) {
+        // $FlowFixMe
         if (this[eventName]) {
+          // $FlowFixMe
           this[eventName](...args);
         }
       }

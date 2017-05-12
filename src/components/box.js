@@ -1,21 +1,26 @@
+// @flow
 import { Component } from '../entityManager';
 import Point from '../geometry/point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
-import type RenderComponent from './render';
 
 
-export default class Box extends Component implements RenderComponent {
+export class Box extends Component {
   state: {
-    pos: Point,
+    position: Point,
     color: Color,
     opacity: number,
   };
 
+  static initialState = {
+    color: new Color(0, 0, 255),
+    opacity: 1,
+  }
+
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { color, opacity, pos: { x, y } } = this.state;
+    const { color, opacity, position: { x, y } } = this.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
 
     const intersect = this.calculateBounds(
@@ -57,7 +62,7 @@ export default class Box extends Component implements RenderComponent {
 
 export class BoxTrigger extends EventTrigger {
   get box(): Box {
-    return this.entity.getComponent('box');
+    return this.entity.getComponents('Box')[0];
   }
 
   onMouseEnter() {

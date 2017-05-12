@@ -1,5 +1,6 @@
+// @flow
 import { Component } from '../entityManager';
-import type EventTrigger from './eventTrigger';
+import EventTrigger from './eventTrigger';
 import type Point from '../geometry/point';
 
 
