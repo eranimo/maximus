@@ -64,6 +64,13 @@ export class Entity {
   }
 }
 
+type Config = { [string]: Object };
+
+export interface EntityType {
+  name: string,
+  components(options: { [string]: any }): Config,
+}
+
 export type GameEvent = {
   name: string,
   value: Object,
@@ -115,8 +122,9 @@ export default class EntityManager {
     this.eventListeners = new Map();
   }
 
-  addEntity(components: { [string]: Object }, name: ?string): Entity {
-    const entity: Entity = new Entity(name);
+  addEntity(entityType: Object, options: Object = {}): Entity {
+    const entity: Entity = new Entity(entityType.name);
+    const components = entityType.components(options);
     for (const [identifier, state]: [string, any] of Object.entries(components)) {
       const _class: ?Class<Component> = this.componentTypes.get(identifier);
       if (_class) {

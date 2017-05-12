@@ -17,9 +17,9 @@ import UISystem from './systems/ui';
 import Box, { BoxTrigger } from './components/box';
 import { MinimapPoint, MinimapBackdrop, MinimapFrame, MinimapLogic } from './components/minimap';
 import { UIViewportText, UIWorldText } from './components/ui';
-import EventTrigger from './components/eventTrigger';
-import { makeBuilding, makeMinimap } from './entityFactory';
 import { VIEWPORT_JUMP } from './events';
+import Building from './entities/building';
+import Minimap from './entities/minimap';
 
 
 export default class World {
@@ -72,9 +72,12 @@ export default class World {
     this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
     this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
 
-    const building: any = makeBuilding(this.manager, new Point(10, 10), 'b1');
-    makeMinimap(this.manager);
-    console.log(building);
+    this.manager.addEntity(Building, {
+      position: new Point(10, 10),
+      name: 'building_1',
+    });
+
+    this.manager.addEntity(Minimap);
   }
 
   draw(timeSinceLastUpdate: number) {
