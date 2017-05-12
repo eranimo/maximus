@@ -13,13 +13,14 @@ import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
 import { VIEWPORT_JUMP } from '../events';
 import type Viewport from '../viewport';
+import type Color from '../utils/color';
 
 
 // renders a point on the minimap
 export class MinimapPoint extends Component {
   state: {
     position: Point,
-    color: string,
+    color: Color,
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
@@ -31,10 +32,10 @@ export class MinimapPoint extends Component {
     const { bounds } = logic.state;
 
     ctx.beginPath();
-    ctx.fillStyle = color;
+    ctx.fillStyle = color.toRGBA();
     ctx.fillRect(
-      bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
-      bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
+      0.5 + bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
+      0.5 + bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
       1,
       1,
     );

@@ -17,7 +17,7 @@ const Building: EntityType = {
     }),
     new MinimapPoint({
       position,
-      color: 'blue',
+      color: new Color(0, 0, 255),
     }),
     new WorldText({
       font: 'sans-serif',
