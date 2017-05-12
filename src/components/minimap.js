@@ -13,18 +13,22 @@ import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
 import { VIEWPORT_JUMP } from '../events';
 import type Viewport from '../viewport';
-import type Color from '../utils/color';
+import type { Box } from '../components/Box';
 
 
 // renders a point on the minimap
 export class MinimapPoint extends Component {
   state: {
     position: Point,
-    color: Color,
+  };
+  box: Box;
+
+  static dependencies = {
+    box: 'Box'
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { color, position: { x, y } } = this.state;
+    const { position: { x, y } } = this.state;
     const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
     if (!logic) {
       throw new Error('Could not find MinimapLogic component');
@@ -32,7 +36,7 @@ export class MinimapPoint extends Component {
     const { bounds } = logic.state;
 
     ctx.beginPath();
-    ctx.fillStyle = color.toRGBA();
+    ctx.fillStyle = this.box.state.color.toRGBA();
     ctx.fillRect(
       0.5 + bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
       0.5 + bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),

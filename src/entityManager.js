@@ -29,7 +29,6 @@ export class Component {
     this.id = currentID;
     currentID++;
   }
-
   init() {}
   update() {}
   sendEvent(event: GameEvent) {
@@ -128,6 +127,18 @@ export default class EntityManager {
     entity.components = components;
     for (const instance: $Subtype<Component> of components) {
       instance.entity = entity;
+      if (instance.constructor.dependencies) {
+        for (const [key, depName]: [string, any] of Object.entries(instance.constructor.dependencies)) {
+          const foundComponents: Array<ComponentClass> = entity.getComponents(depName);
+          if (foundComponents.length === 0) {
+            throw new Error(`Missing required component ${depName}`);
+          } else if (foundComponents.length === 1) {
+            instance[key] = foundComponents[0];
+          } else {
+            instance[key] = foundComponents;
+          }
+        }
+      }
       instance.init();
     }
     entity.manager = this;
