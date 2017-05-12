@@ -5,6 +5,7 @@ import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
+import { GridCell } from './grid';
 
 
 export class Box extends Component {
@@ -13,14 +14,19 @@ export class Box extends Component {
     color: Color,
     opacity: number,
   };
+  cell: GridCell;
 
   static initialState = {
     color: new Color(0, 0, 255),
     opacity: 1,
   }
+  static dependencies = {
+    cell: 'GridCell',
+  }
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { color, opacity, position: { x, y } } = this.state;
+    const { color, opacity } = this.state;
+    const { position: { x, y } } = this.cell.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
 
     const intersect = this.calculateBounds(
@@ -61,9 +67,10 @@ export class Box extends Component {
 
 
 export class BoxTrigger extends EventTrigger {
-  get box(): Box {
-    return this.entity.getComponents('Box')[0];
+  static dependencies = {
+    box: 'Box',
   }
+  box: Box;
 
   onMouseEnter() {
     this.box.state.opacity = 0.5;

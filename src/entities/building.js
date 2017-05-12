@@ -7,18 +7,19 @@ import Point from '../geometry/point';
 import { Box, BoxTrigger } from '../components/box';
 import { MinimapPoint } from '../components/minimap';
 import { WorldText } from '../components/ui';
+import { GridCell } from '../components/grid';
 
 
 const Building: EntityType = {
   name: 'Building',
   components: ({ position }: { position: Point }): any => ([
-    new Box({
+    new GridCell({
       position
     }),
-    new MinimapPoint({
-      position,
-      color: new Color(0, 0, 255),
+    new Box({
+      color: new Color(0, 0, 255)
     }),
+    new MinimapPoint(),
     new WorldText({
       font: 'sans-serif',
       size: 7,

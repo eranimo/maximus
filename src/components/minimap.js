@@ -14,6 +14,7 @@ import Point from '../geometry/point';
 import { VIEWPORT_JUMP } from '../events';
 import type Viewport from '../viewport';
 import type { Box } from '../components/Box';
+import { GridCell } from './grid';
 
 
 // renders a point on the minimap
@@ -22,13 +23,14 @@ export class MinimapPoint extends Component {
     position: Point,
   };
   box: Box;
-
+  cell: GridCell;
   static dependencies = {
-    box: 'Box'
+    box: 'Box',
+    cell: 'GridCell',
   };
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    const { position: { x, y } } = this.state;
+    const { position: { x, y } } = this.cell.state;
     const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
     if (!logic) {
       throw new Error('Could not find MinimapLogic component');
