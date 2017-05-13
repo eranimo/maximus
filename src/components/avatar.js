@@ -13,6 +13,7 @@ export class Avatar extends Component {
     opacity: number,
   };
   pos: MapPosition;
+  systems: Object;
 
   static initialState = {
     color: new Color(0, 0, 255),
@@ -49,6 +50,7 @@ export class Avatar extends Component {
   }
 
   update() {
-    this.pos.state.position.x += 0.01;
+    const speed = this.systems.TimeSystem.speed;
+    this.pos.state.position.x += 0.01 * speed;
   }
 }

@@ -14,6 +14,7 @@ import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 import GridSystem from './systems/grid';
+import TimeSystem from './systems/time';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
@@ -27,9 +28,6 @@ export default class World {
 
   viewport: Viewport;
   region: Region;
-  tick: number;
-  time: number;
-  speed: number;
 
   manager: EntityManager;
 
@@ -38,6 +36,7 @@ export default class World {
   minimapUISystem: MinimapUISystem;
   uiSystem: UISystem;
   gridSystem: GridSystem;
+  timeSystem: TimeSystem;
 
   constructor({ main }: { main: HTMLElement }) {
     this.viewport = new Viewport({
@@ -48,19 +47,19 @@ export default class World {
       height: VIEWPORT_HEIGHT,
     }, main);
     window.canvas = main;
-    this.tick = 0;
     window.viewport = this.viewport;
     this.region = new Region(this, main, this.viewport);
-    this.time = 1;
-    this.speed = 1;
 
     this.manager = new EntityManager();
 
+    this.timeSystem = new TimeSystem(this.manager);
     this.eventSystem = new EventSystem(this.manager, this.viewport, (this.region.canvas: any));
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
     this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
     this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
     this.gridSystem = new GridSystem(this.manager);
+
+    window.time = this.timeSystem;
 
     this.manager.addEntity(Building, {
       position: new Point(10, 10)
@@ -99,7 +98,8 @@ export default class World {
     this.uiSystem.update();
     this.minimapUISystem.update();
     this.gridSystem.update();
-    this.tick++;
+
+    this.timeSystem.tickNumber++;
   }
 
   loop() {
@@ -122,7 +122,7 @@ export default class World {
       if (timeSinceLastUpdate >= refreshDelay) {
         this.update();
 
-        this.time = this.time + (timeSinceLastUpdate * this.speed);
+        this.timeSystem.time = this.timeSystem.time + (timeSinceLastUpdate * this.timeSystem.speed);
       }
       this.draw(timeSinceLastUpdate);
       timeSinceLastUpdate = 0;
