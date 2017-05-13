@@ -17,7 +17,7 @@ const Building: EntityType = {
     return [
       new GridCell({
         position,
-        isWalkable: false,
+        weight: 0,
         type: 'world',
         bounds
       }),

@@ -8,10 +8,14 @@ import Rectangle from '../geometry/rectangle';
 export class GridCell extends EventTrigger {
   state: {
     position: Point,
-    isWalkable: boolean,
+    weight: number,
     bounds: Rectangle
   }
   systems: Object;
+
+  init() {
+    this.systems.GridSystem.registerCell(this);
+  }
 
   onMouseUp() {
     this.systems.GridSystem.activeCell = this;
