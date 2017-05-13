@@ -135,7 +135,7 @@ export default class EntityManager {
         for (const [key, depName]: [string, any] of Object.entries(instance.constructor.dependencies)) {
           const foundComponents: Array<ComponentClass> = entity.getComponents(depName);
           if (foundComponents.length === 0) {
-            throw new Error(`Missing required component ${depName}`);
+            throw new Error(`Component '${instance.constructor.name}' is missing required component ${depName}`);
           } else if (foundComponents.length === 1) {
             instance[key] = foundComponents[0];
           } else {

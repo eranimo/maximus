@@ -94,8 +94,11 @@ export default class EventSystem extends System {
 
   handleMouseMove(event: MouseEvent) {
     this.processEvent(event, (comp: ComponentClass, viewportPoint: Point, worldPoint: Point) => {
-      const whichPoint = comp.state.type === 'viewport' ? viewportPoint : worldPoint;
-      const isAtComponent = comp.state.bounds.containsPoint(whichPoint);
+      const whichPoint = comp.constructor.eventType === 'viewport' ? viewportPoint : worldPoint;
+      if (!comp.bounds) {
+        throw new Error(`Component ${comp.constructor.name} does not have a bounds property`);
+      }
+      const isAtComponent = comp.bounds.containsPoint(whichPoint);
       if (this.mouseMoveComponents.has(comp) && !isAtComponent) {
         comp.trigger('onMouseLeave', [whichPoint]);
       }

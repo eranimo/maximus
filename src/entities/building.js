@@ -1,25 +1,21 @@
 // @flow
 import type { EntityType } from '../entityManager';
-import Rectangle from '../geometry/rectangle';
 import Color from '../utils/color';
-import { CELL_SIZE } from '../constants';
 import Point from '../geometry/point';
 import { Box, BoxTrigger } from '../components/box';
 import { MinimapPoint } from '../components/minimap';
 import { WorldText } from '../components/ui';
-import { GridCell } from '../components/gridCell';
+import { MapPosition } from '../components/position';
 
 
 const Building: EntityType = {
   name: 'Building',
   components: ({ position }: { position: Point }): any => {
-    const bounds = new Rectangle(position.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE);
     return [
-      new GridCell({
+      new MapPosition({
         position,
         weight: 0,
         type: 'world',
-        bounds
       }),
       new Box({
         color: new Color(0, 0, 255)
@@ -35,7 +31,6 @@ const Building: EntityType = {
       }),
       new BoxTrigger({
         type: 'world',
-        bounds,
       }),
     ];
   }

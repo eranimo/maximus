@@ -1,7 +1,7 @@
 // @flow
 import { System } from '../entityManager';
 import type EventManager from '../entityManager';
-import { GridCell } from '../components/gridCell';
+import { MapPosition } from '../components/position';
 import { SCENE_CELLS_WIDTH, SCENE_CELLS_HEIGHT } from '../constants';
 import GridWorker from 'worker-loader!../workers/gridWorker';
 
@@ -9,10 +9,10 @@ import GridWorker from 'worker-loader!../workers/gridWorker';
 // a system that handles browser events passed to components
 export default class GridSystem extends System {
   static componentTypes = [
-    GridCell,
+    MapPosition,
   ];
 
-  activeCell: GridCell;
+  activeCell: MapPosition;
   worker: GridWorker;
 
   constructor(manager: EventManager) {
@@ -28,7 +28,7 @@ export default class GridSystem extends System {
     });
   }
 
-  registerCell(cell: GridCell) {
+  registerCell(cell: MapPosition) {
     this.worker.postMessage({
       type: 'set',
       payload: {

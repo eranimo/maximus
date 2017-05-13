@@ -1,27 +1,27 @@
 // @flow
 import { Component } from '../entityManager';
 import Point from '../geometry/point';
+import Rectangle from '../geometry/rectangle';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
-import type { GridCell } from './gridCell';
+import type { MapPosition } from './position';
 
 
 export class Box extends Component {
   state: {
-    position: Point,
     color: Color,
     opacity: number,
   };
-  cell: GridCell;
+  cell: MapPosition;
 
   static initialState = {
     color: new Color(0, 0, 255),
     opacity: 1,
   }
   static dependencies = {
-    cell: 'GridCell',
+    cell: 'MapPosition',
   }
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
@@ -48,9 +48,19 @@ export class Box extends Component {
 
 export class BoxTrigger extends EventTrigger {
   static dependencies = {
-    box: 'Box',
+    pos: 'MapPosition',
+    box: 'Box'
   }
+  pos: MapPosition;
   box: Box;
+
+  get bounds(): Rectangle {
+    return new Rectangle(
+      this.pos.state.position.multiply(CELL_SIZE),
+      CELL_SIZE,
+      CELL_SIZE
+    );
+  }
 
   onMouseEnter() {
     this.box.state.opacity = 0.5;

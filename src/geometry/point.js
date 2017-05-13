@@ -10,8 +10,6 @@ export default class Point {
       this.x = x.x;
       this.y = x.y;
     }
-
-    Object.freeze(this);
   }
 
   add(amount: number): Point {

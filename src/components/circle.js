@@ -4,28 +4,27 @@ import Point from '../geometry/point';
 import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import Color from '../utils/color';
-import type { GridCell } from './gridCell';
+import type { MapPosition } from './position';
 
 
 export class Circle extends Component {
   state: {
-    position: Point,
     color: Color,
     opacity: number,
   };
-  cell: GridCell;
+  pos: MapPosition;
 
   static initialState = {
     color: new Color(0, 0, 255),
     opacity: 1,
   }
   static dependencies = {
-    cell: 'GridCell',
+    pos: 'MapPosition',
   }
 
   draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
     const { color, opacity } = this.state;
-    const { position: { x, y } } = this.cell.state;
+    const { position: { x, y } } = this.pos.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
     ctx.lineWidth = 1;
 
@@ -47,5 +46,9 @@ export class Circle extends Component {
       ctx.fill();
       ctx.stroke();
     }
+  }
+
+  update() {
+    this.pos.state.position.x += 0.01;
   }
 }
