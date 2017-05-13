@@ -2,7 +2,7 @@
 import type { EntityType } from '../entityManager';
 import Color from '../utils/color';
 import Point from '../geometry/point';
-import { Circle } from '../components/circle';
+import { Avatar } from '../components/avatar';
 import { MinimapPoint } from '../components/minimap';
 import { MapPosition } from '../components/position';
 import { PersonTrigger } from '../components/person';
@@ -15,11 +15,10 @@ const Person: EntityType = {
   components: ({ position }: { position: Point }): any => ([
     new MapPosition({
       position,
-      type: 'world',
-      bounds: new Rectangle(position.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE)
+      positionType: 'circle',
     }),
     new PersonTrigger(),
-    new Circle({
+    new Avatar({
       color: new Color(255, 0, 0)
     }),
     new MinimapPoint(),

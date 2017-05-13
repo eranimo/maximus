@@ -7,7 +7,7 @@ import Color from '../utils/color';
 import type { MapPosition } from './position';
 
 
-export class Circle extends Component {
+export class Avatar extends Component {
   state: {
     color: Color,
     opacity: number,
