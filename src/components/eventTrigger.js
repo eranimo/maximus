@@ -5,6 +5,10 @@ import { Component } from '../entityManager';
 export default class EventTrigger extends Component {
   callbacks: Map<string, Array<Array<any>>>;
 
+  static initialState = {
+    type: 'world'
+  }
+
   constructor() {
     super(...arguments);
     this.callbacks = new Map();

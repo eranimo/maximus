@@ -25,7 +25,7 @@ export default class Rectangle {
   }
 
   get y2(): number {
-    return this.position.x + this.height;
+    return this.position.y + this.height;
   }
 
   containsPoint(point: Point): boolean {

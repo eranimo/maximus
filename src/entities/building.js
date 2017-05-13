@@ -7,32 +7,38 @@ import Point from '../geometry/point';
 import { Box, BoxTrigger } from '../components/box';
 import { MinimapPoint } from '../components/minimap';
 import { WorldText } from '../components/ui';
-import { GridCell } from '../components/grid';
+import { GridCell } from '../components/gridCell';
 
 
 const Building: EntityType = {
   name: 'Building',
-  components: ({ position }: { position: Point }): any => ([
-    new GridCell({
-      position
-    }),
-    new Box({
-      color: new Color(0, 0, 255)
-    }),
-    new MinimapPoint(),
-    new WorldText({
-      font: 'sans-serif',
-      size: 7,
-      color: '#C0C0C0',
-      shadow: true,
-      text: 'foobar',
-      position: position,
-    }),
-    new BoxTrigger({
-      type: 'world',
-      bounds: new Rectangle(position.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE)
-    }),
-  ])
+  components: ({ position }: { position: Point }): any => {
+    const bounds = new Rectangle(position.multiply(CELL_SIZE), CELL_SIZE, CELL_SIZE);
+    return [
+      new GridCell({
+        position,
+        isWalkable: false,
+        type: 'world',
+        bounds
+      }),
+      new Box({
+        color: new Color(0, 0, 255)
+      }),
+      new MinimapPoint(),
+      new WorldText({
+        font: 'sans-serif',
+        size: 7,
+        color: '#C0C0C0',
+        shadow: true,
+        text: `${position.x},${position.y}`,
+        position: position,
+      }),
+      new BoxTrigger({
+        type: 'world',
+        bounds,
+      }),
+    ];
+  }
 };
 
 export default Building;

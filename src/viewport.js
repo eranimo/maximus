@@ -299,4 +299,23 @@ export default class Viewport {
     return this.topLeft.x >= point.x && point.x <= this.bottomRight.x ||
            this.topLeft.y >= point.y && point.y <= this.bottomRight.y;
   }
+
+  calculateBounds(loc: Point, width: number, height: number): ?Object {
+    const loc2 = new Point(loc.x + width, loc.y + height);
+    const loc3 = new Point(loc.x, loc.y + height);
+    const loc4 = new Point(loc.x + width, loc.y);
+    if (
+      this.isInViewport(this.worldToViewport(loc)) ||
+      this.isInViewport(this.worldToViewport(loc2)) ||
+      this.isInViewport(this.worldToViewport(loc3)) ||
+      this.isInViewport(this.worldToViewport(loc4))
+    ) {
+      const topLeft = this.worldToViewport(loc);
+      const bottomRight = this.worldToViewport(loc2);
+      const newWidth = bottomRight.x - topLeft.x;
+      const newHeight = bottomRight.y - topLeft.y;
+      return { topLeft, width: newWidth, height: newHeight };
+    }
+    return null;
+  }
 }

@@ -80,6 +80,7 @@ export class System {
 
   constructor(manager: EntityManager) {
     this.manager = manager;
+    this.manager.systems[this.constructor.name] = this;
 
     console.log(
       `Registered system ${this.constructor.name} with ${this.constructor.componentTypes.length} components\n`,
@@ -102,6 +103,7 @@ export class System {
     return foundComponents;
   }
 
+  draw() {}
   update() {}
 }
 
@@ -111,11 +113,13 @@ export default class EntityManager {
   entities: Array<Entity>;
   componentInstances: Array<ComponentClass>;
   events: Set<GameEvent>;
+  systems: { [string]: System };
   eventListeners: Map<string, Array<Function>>;
 
   constructor() {
     this.componentInstances = [];
     this.entities = [];
+    this.systems = {};
     this.events = new Set();
     this.eventListeners = new Map();
   }
@@ -139,6 +143,7 @@ export default class EntityManager {
           }
         }
       }
+      instance.systems = this.systems;
       instance.init();
     }
     entity.manager = this;

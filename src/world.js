@@ -13,10 +13,12 @@ import DisplaySystem from './systems/display';
 import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';
 import UISystem from './systems/ui';
+import GridSystem from './systems/grid';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
 import Minimap from './entities/minimap';
+import Person from './entities/person';
 
 
 export default class World {
@@ -35,6 +37,7 @@ export default class World {
   displaySystem: DisplaySystem;
   minimapUISystem: MinimapUISystem;
   uiSystem: UISystem;
+  gridSystem: GridSystem;
 
   constructor({ main }: { main: HTMLElement }) {
     this.viewport = new Viewport({
@@ -57,12 +60,22 @@ export default class World {
     this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
     this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
     this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
+    this.gridSystem = new GridSystem(this.manager);
 
     this.manager.addEntity(Building, {
-      position: new Point(10, 10),
-      name: 'building_1',
+      position: new Point(10, 10)
     });
 
+    for (let i = 5; i < 15; i++) {
+      this.manager.addEntity(Building, {
+        position: new Point(15, i),
+      });
+    }
+
+    this.manager.addEntity(Person, {
+      position: new Point(11, 10),
+      name: 'person_1',
+    });
     this.manager.addEntity(Minimap);
     window.manager = this.manager;
   }
@@ -85,6 +98,7 @@ export default class World {
     this.displaySystem.update();
     this.uiSystem.update();
     this.minimapUISystem.update();
+    this.gridSystem.update();
     this.tick++;
   }
 
