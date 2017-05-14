@@ -1,3 +1,6 @@
+import { random, inRange } from 'lodash';
+
+
 export default class Point {
   x: number;
   y: number;
@@ -10,6 +13,13 @@ export default class Point {
       this.x = x.x;
       this.y = x.y;
     }
+  }
+
+  static random(maxX: number, maxY: number): Point {
+    return new Point(
+      random(maxX),
+      random(maxY),
+    );
   }
 
   add(amount: number): Point {
@@ -31,6 +41,16 @@ export default class Point {
       this.x * amount,
       this.y * amount,
     );
+  }
+
+  // is this point within range?
+  within(point: Point, range: number): boolean {
+    return inRange(this.x, point.x - range, point.x + range) &&
+           inRange(this.y, point.y - range, point.y + range);
+  }
+
+  equals(point: Point): boolean {
+    return this.x === point.x && this.y === point.y;
   }
 
   distanceTo(point: Point): number {

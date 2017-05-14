@@ -51,6 +51,6 @@ export class Avatar extends Component {
 
   update() {
     const speed = this.systems.TimeSystem.speed;
-    this.pos.state.position.x += 0.01 * speed;
+    // this.pos.state.position.x += 0.01 * speed;
   }
 }

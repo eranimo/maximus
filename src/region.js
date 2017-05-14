@@ -36,7 +36,7 @@ export default class Region {
     };
   }
 
-  draw(timeSinceLastUpdate: number) {
+  draw(timeSinceLastUpdate: number, time: number) {
     const ctx = this.ctx;
     const viewport = this.viewport;
 
@@ -90,7 +90,7 @@ export default class Region {
       ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
     }
     ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
-    ctx.fillText(`Time Δ (s): (${Math.round(this.world.time / 1000)})`, 0, 7 * 20);
+    ctx.fillText(`Time Δ (s): (${Math.round(time / 1000)})`, 0, 7 * 20);
 
 
     // draw hover cell

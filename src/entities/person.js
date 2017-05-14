@@ -6,8 +6,7 @@ import { Avatar } from '../components/avatar';
 import { MinimapPoint } from '../components/minimap';
 import { MapPosition } from '../components/position';
 import { PersonTrigger } from '../components/person';
-import Rectangle from '../geometry/rectangle';
-import { CELL_SIZE } from '../constants';
+import { Walk } from '../components/walk';
 
 
 const Person: EntityType = {
@@ -22,6 +21,7 @@ const Person: EntityType = {
       color: new Color(255, 0, 0)
     }),
     new MinimapPoint(),
+    new Walk(),
   ])
 };
 

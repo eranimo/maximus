@@ -19,6 +19,15 @@ export default class TimeSystem extends System {
     this.prevSpeed = 1;
   }
 
+  get timeSeconds(): number {
+    return this.time / 1000;
+  }
+
+  update() {
+    this.time += this.speed;
+    this.tickNumber++;
+  }
+
   pause() {
     this.isPaused = true;
     this.prevSpeed = this.speed;

@@ -21,6 +21,7 @@ export class Component {
   id: number;
   entity: Entity;
   state: Object;
+  waitUntilTime: ?number;
 
   static initialState = {};
 
@@ -113,7 +114,7 @@ export default class EntityManager {
   entities: Array<Entity>;
   componentInstances: Array<ComponentClass>;
   events: Set<GameEvent>;
-  systems: { [string]: System };
+  systems: { [string]: $Subtype<System> };
   eventListeners: Map<string, Array<Function>>;
 
   constructor() {
@@ -167,11 +168,18 @@ export default class EntityManager {
 
   // update all entities
   update() {
-    // for (const entity of this.entities) {
-    //   for (const [identifier, instance]: [string, Component] of entity.components.entries()) {
-    //     instance.update();
-    //   }
-    // }
+    for (const entity of this.entities) {
+      for (const instance: ComponentClass of entity.components) {
+        if (instance.waitUntilTime) {
+          if (this.systems.TimeSystem.time > instance.waitUntilTime) {
+            delete instance.waitUntilTime;
+            instance.update();
+          }
+        } else {
+          instance.update();
+        }
+      }
+    }
     if (this.events.size > 0) {
       for (const event: GameEvent of this.events) {
         if (this.eventListeners.has(event.name)) {

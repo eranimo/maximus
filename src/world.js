@@ -6,6 +6,9 @@ import {
   SCENE_HEIGHT,
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
+  SCENE_CELLS_WIDTH,
+  SCENE_CELLS_HEIGHT,
+  CELL_SIZE
 } from './constants';
 import EntityManager from './entityManager';
 import Point from './geometry/point';
@@ -71,16 +74,20 @@ export default class World {
       });
     }
 
-    this.manager.addEntity(Person, {
+    const person = this.manager.addEntity(Person, {
       position: new Point(11, 10),
       name: 'person_1',
     });
+    const walk = person.getComponents('Walk');
+    walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
+    console.log(walk);
+
     this.manager.addEntity(Minimap);
     window.manager = this.manager;
   }
 
   draw(timeSinceLastUpdate: number) {
-    this.region.draw(timeSinceLastUpdate);
+    this.region.draw(timeSinceLastUpdate, this.timeSystem.time);
     this.displaySystem.draw();
     this.uiSystem.draw();
     this.minimapUISystem.draw();
@@ -98,8 +105,7 @@ export default class World {
     this.uiSystem.update();
     this.minimapUISystem.update();
     this.gridSystem.update();
-
-    this.timeSystem.tickNumber++;
+    this.timeSystem.update();
   }
 
   loop() {
