@@ -40,6 +40,7 @@ export default class ViewportSystem extends System {
     this.keysPressed = {};
 
     this.canvas.style.cursor = 'pointer';
+    // TODO: factor out all event handling into the event system
     window.addEventListener('resize', this.handleResize.bind(this));
     this.canvas.addEventListener('mouseup', this.panUp.bind(this));
     this.canvas.addEventListener('mousedown', this.panDown.bind(this));

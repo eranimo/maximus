@@ -31,7 +31,21 @@ export default class SelectionSystem extends System {
     console.warn(`Entity ${name} is not selected`);
   }
 
+  deselectAll() {
+    this.selected = new Set();
+  }
+
   toggle(entity: Entity) {
+    if (!this.systems.keyboard.isKeyPressed('shift')) {
+      if (this.selected.has(entity)) {
+        this.deselectAll();
+        //this.deselect(entity);
+      } else {
+        this.deselectAll();
+        this.select(entity);
+      }
+      return;
+    }
     if (this.selected.has(entity)) {
       this.deselect(entity);
     } else {

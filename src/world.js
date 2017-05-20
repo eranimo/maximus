@@ -18,6 +18,7 @@ import UISystem from './systems/ui';
 import GridSystem from './systems/grid';
 import TimeSystem from './systems/time';
 import SelectionSystem from './systems/selection';
+import KeyboardSystem from './systems/keyboard';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
@@ -47,6 +48,7 @@ export default class World {
       ui: new UISystem(),
       grid: new GridSystem(),
       selection: new SelectionSystem(),
+      keyboard: new KeyboardSystem(),
     });
     window.canvas = main;
 
