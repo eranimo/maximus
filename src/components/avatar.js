@@ -9,14 +9,14 @@ import type { MapPosition } from './position';
 export class Avatar extends Component {
   state: {
     color: Color,
-    opacity: number,
+    isHover: boolean,
   };
   pos: MapPosition;
   systems: Object;
 
   static initialState = {
     color: new Color(0, 0, 255),
-    opacity: 1,
+    isHover: false,
   }
   static dependencies = {
     pos: 'MapPosition',
@@ -28,7 +28,8 @@ export class Avatar extends Component {
 
   draw() {
     const { ctx } = this.systems.region;
-    const { color, opacity } = this.state;
+    const { color, isHover } = this.state;
+    const opacity = isHover ? 0.5 : 1;
     const { position } = this.pos.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
     ctx.lineWidth = 1;
@@ -53,6 +54,6 @@ export class Avatar extends Component {
   }
 
   update() {
-    this.systems.viewport.jump(this.pos.state.position.multiply(CELL_SIZE).add(this.radius));
+    // this.systems.viewport.jump(this.pos.state.position.multiply(CELL_SIZE).add(this.radius));
   }
 }

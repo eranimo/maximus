@@ -18,14 +18,14 @@ export class PersonTrigger extends EventTrigger {
   }
 
   onMouseUp() {
-    alert('click on person!');
+    this.systems.selection.toggle(this.entity);
   }
 
   onMouseEnter() {
-    this.avatar.state.opacity = 0.5;
+    this.avatar.state.isHover = true;
   }
 
   onMouseLeave() {
-    this.avatar.state.opacity = 1;
+    this.avatar.state.isHover = false;
   }
 }

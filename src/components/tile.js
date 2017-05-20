@@ -71,6 +71,7 @@ export class BoxTrigger extends EventTrigger {
   }
 
   onMouseUp() {
-    this.tile.state.color = Color.random();
+    // this.tile.state.color = Color.random();
+    this.systems.selection.toggle(this.entity);
   }
 }

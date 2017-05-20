@@ -17,6 +17,7 @@ import EventSystem from './systems/event';
 import UISystem from './systems/ui';
 import GridSystem from './systems/grid';
 import TimeSystem from './systems/time';
+import SelectionSystem from './systems/selection';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
@@ -45,6 +46,7 @@ export default class World {
       minimap: new MinimapUISystem(),
       ui: new UISystem(),
       grid: new GridSystem(),
+      selection: new SelectionSystem(),
     });
     window.canvas = main;
 
@@ -59,6 +61,11 @@ export default class World {
         position: new Point(15, i),
       });
     }
+
+    const someone = this.manager.addEntity(Person, {
+      position: new Point(16, 15),
+      name: 'person_0',
+    });
 
     const person = this.manager.addEntity(Person, {
       position: new Point(11, 10),

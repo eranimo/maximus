@@ -60,6 +60,10 @@ export class Entity {
     return this.components.filter((comp: Component): boolean => comp.constructor.name === identifier);
   }
 
+  hasComponent(identifier: string): boolean {
+    return this.getComponents(identifier).length > 0;
+  }
+
   // export(): Object {
   //   const data = {};
   //   for (const [identifier, instance]: [string, Component] of this.components.entries()) {

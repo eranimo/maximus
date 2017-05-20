@@ -1,8 +1,10 @@
+// @flow
 import Point from './point';
 
 
 export default class Circle {
   center: Point;
+  radius: number;
 
   constructor(x: ?number, y: ?number, radius: number) {
     this.center = new Point(x, y);

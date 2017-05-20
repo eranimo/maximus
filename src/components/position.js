@@ -19,7 +19,7 @@ export class MapPosition extends EventTrigger {
     positionType: 'rectangle',
   };
 
-  get bounds(): Rectangle {
+  get bounds(): Object {
     if (this.state.positionType === 'circle') {
       return Circle.fromPoint(
         this.state.position.multiply(CELL_SIZE).add(CELL_SIZE / 2),
@@ -31,6 +31,28 @@ export class MapPosition extends EventTrigger {
       CELL_SIZE,
       CELL_SIZE
     );
+  }
+
+  drawBounds(ctx: CanvasRenderingContext2D) {
+    const viewport = this.systems.viewport;
+    if (this.state.positionType === 'circle') {
+      const center = viewport.worldToViewport(this.bounds.center);
+      ctx.arc(
+        center.x,
+        center.y,
+        viewport.toZoom(this.bounds.radius),
+        0,
+        2 * Math.PI
+      );
+    } else {
+      const position = viewport.worldToViewport(this.bounds.position);
+      ctx.rect(
+        position.x,
+        position.y,
+        viewport.toZoom(this.bounds.width),
+        viewport.toZoom(this.bounds.height),
+      );
+    }
   }
 
   init() {

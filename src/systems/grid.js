@@ -38,9 +38,9 @@ export default class GridSystem extends System {
     });
   }
 
-  update() {
-    if (this.activeCell) {
-      console.log(this.activeCell);
-    }
-  }
+  // update() {
+  //   if (this.activeCell) {
+  //     console.log(this.activeCell);
+  //   }
+  // }
 }
