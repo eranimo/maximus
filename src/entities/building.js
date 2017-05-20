@@ -2,7 +2,7 @@
 import type { EntityType } from '../entityManager';
 import Color from '../utils/color';
 import Point from '../geometry/point';
-import { Box, BoxTrigger } from '../components/box';
+import { Tile, BoxTrigger } from '../components/tile';
 import { MinimapPoint } from '../components/minimap';
 import { WorldText } from '../components/ui';
 import { MapPosition } from '../components/position';
@@ -17,7 +17,7 @@ const Building: EntityType = {
         weight: 0,
         type: 'world',
       }),
-      new Box({
+      new Tile({
         color: new Color(0, 0, 255)
       }),
       new MinimapPoint(),

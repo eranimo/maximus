@@ -98,7 +98,7 @@ export default class Region extends System {
 
 
     // draw hover cell
-    this.drawCursor();
+    // this.drawCursor();
   }
 
   drawCursor() {

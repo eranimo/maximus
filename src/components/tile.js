@@ -8,7 +8,7 @@ import Color from '../utils/color';
 import type { MapPosition } from './position';
 
 
-export class Box extends Component {
+export class Tile extends Component {
   state: {
     color: Color,
     opacity: number,
@@ -49,10 +49,10 @@ export class Box extends Component {
 export class BoxTrigger extends EventTrigger {
   static dependencies = {
     pos: 'MapPosition',
-    box: 'Box'
+    tile: 'Tile'
   }
   pos: MapPosition;
-  box: Box;
+  tile: Tile;
 
   get bounds(): Rectangle {
     return new Rectangle(
@@ -63,14 +63,14 @@ export class BoxTrigger extends EventTrigger {
   }
 
   onMouseEnter() {
-    this.box.state.opacity = 0.5;
+    this.tile.state.opacity = 0.5;
   }
 
   onMouseLeave() {
-    this.box.state.opacity = 1;
+    this.tile.state.opacity = 1;
   }
 
   onMouseUp() {
-    this.box.state.color = Color.random();
+    this.tile.state.color = Color.random();
   }
 }
