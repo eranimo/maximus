@@ -36,6 +36,10 @@ export class Component {
     this.entity.manager.emitEvent(event);
   }
   on(event: GameEvent) {} // eslint-disable-line
+
+  get systems(): { [string]: $Subtype<System> } {
+    return this.entity.manager.systems;
+  }
 }
 
 export class Entity {
@@ -79,16 +83,8 @@ export class System {
   manager: EntityManager;
   static componentTypes: Array<Class<ComponentClass>> = [];
 
-  constructor(manager: EntityManager) {
-    this.manager = manager;
-    this.manager.systems[this.constructor.name] = this;
-
-    console.log(
-      `Registered system ${this.constructor.name} with ${this.constructor.componentTypes.length} components\n`,
-      this.constructor.componentTypes.map((c: Class<ComponentClass>): string => {
-        return `\t- ${c.name}`;
-      }).join('\n')
-    );
+  get systems(): { [string]: $Subtype<System> } {
+    return this.manager.systems;
   }
 
   // gets the components this system cares about
@@ -103,8 +99,8 @@ export class System {
     }
     return foundComponents;
   }
-
-  draw() {}
+  init() {}
+  draw(timeSinceLastUpdate: number) {}
   update() {}
 }
 
@@ -117,19 +113,27 @@ export default class EntityManager {
   systems: { [string]: $Subtype<System> };
   eventListeners: Map<string, Array<Function>>;
 
-  constructor() {
+  constructor(systems: { [string]: $Subtype<System> }) {
     this.componentInstances = [];
     this.entities = [];
-    this.systems = {};
+    this.systems = systems;
+    console.log(this.systems);
+    for (const [name, system]: [string, any] of Object.entries(this.systems)) {
+      system.manager = this;
+      system.init();
+    }
     this.events = new Set();
     this.eventListeners = new Map();
   }
+
+
 
   addEntity(entityType: Object, options: Object = {}): Entity {
     const entity: Entity = new Entity(entityType.name);
     const components = entityType.components(options);
     this.componentInstances.push(...components);
     entity.components = components;
+    entity.manager = this;
     for (const instance: $Subtype<Component> of components) {
       instance.entity = entity;
       if (instance.constructor.dependencies) {
@@ -144,10 +148,8 @@ export default class EntityManager {
           }
         }
       }
-      instance.systems = this.systems;
       instance.init();
     }
-    entity.manager = this;
     this.entities.push(entity);
     return entity;
   }

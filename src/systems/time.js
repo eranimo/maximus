@@ -11,8 +11,8 @@ export default class TimeSystem extends System {
   prevSpeed: number;
   isPaused: boolean;
 
-  constructor(manager: EntityManager) {
-    super(manager);
+  constructor() {
+    super();
     this.tickNumber = 1;
     this.time = 1;
     this.speed = 1;

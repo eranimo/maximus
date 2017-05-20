@@ -4,8 +4,6 @@ import World from './world';
 import {
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
-  MINIMAP_WIDTH,
-  MINIMAP_HEIGHT,
 } from './constants';
 
 

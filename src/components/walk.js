@@ -21,6 +21,8 @@ export class Walk extends Component {
   destination: ?Point;
   systems: Object;
   pos: MapPosition;
+  waitTime: number;
+  walkSpeed: number;
 
   static dependencies = {
     pos: 'MapPosition',
@@ -28,6 +30,8 @@ export class Walk extends Component {
 
   init() {
     this.queue = [];
+    this.waitTime = 10;
+    this.walkSpeed = 1;
   }
 
   clear() {
@@ -43,7 +47,7 @@ export class Walk extends Component {
   }
 
   update() {
-    const time = this.systems.TimeSystem;
+    const time = this.systems.time;
     const speed = time.speed;
     if (time.isPaused) {
       return;
@@ -62,7 +66,7 @@ export class Walk extends Component {
       diffX = diffX / Math.abs(diffX);
       diffY = diffY / Math.abs(diffY);
       if (diffX !== 0 && !isNaN(diffX)) {
-        const increaseX = (diffX * 0.5) * speed;
+        const increaseX = (diffX * this.walkSpeed) * speed;
         if (this.destination &&
             ((worldPosition.x < this.destination.x && worldPosition.x + increaseX > this.destination.x) ||
              (worldPosition.x > this.destination.x && worldPosition.x + increaseX < this.destination.x))) {
@@ -72,7 +76,7 @@ export class Walk extends Component {
         }
       }
       if (diffY !== 0 && !isNaN(diffY)) {
-        const increaseY = (diffY * 0.5) * speed;
+        const increaseY = (diffY * this.walkSpeed) * speed;
         if (this.destination &&
             ((worldPosition.y < this.destination.y && worldPosition.y + increaseY > this.destination.y) ||
              (worldPosition.y > this.destination.y && worldPosition.y + increaseY < this.destination.y))) {
@@ -93,7 +97,7 @@ export class Walk extends Component {
           console.log('destination reached!');
           this.destination = null;
         }
-        this.waitUntilTime = time.time + 10 * 1000;
+        this.waitUntilTime = time.time + this.waitTime * 1000;
 
         this.goTo(Point.random(100, 100).multiply(CELL_SIZE));
       }

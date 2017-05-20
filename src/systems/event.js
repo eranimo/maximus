@@ -1,9 +1,9 @@
 // @flow
 import { System } from '../entityManager';
-import type EventManager, { ComponentClass } from '../entityManager';
+import type { ComponentClass } from '../entityManager';
 import EventTrigger from '../components/eventTrigger';
 import Point from '../geometry/point';
-import Viewport from '../viewport';
+import Viewport from './viewport';
 
 
 // a system that handles browser events passed to components
@@ -17,10 +17,9 @@ export default class EventSystem extends System {
   activeEvents: Array<Event>;
   mouseMoveComponents: Set<ComponentClass>;
 
-  constructor(manager: EventManager, viewport: Viewport, canvas: HTMLCanvasElement) {
-    super(manager);
-    this.viewport = viewport;
-    this.canvas = canvas;
+  init() {
+    this.viewport = this.systems.viewport;
+    this.canvas = this.systems.region.canvas;
     this.activeEvents = [];
     this.mouseMoveComponents = new Set();
 

@@ -1,6 +1,7 @@
 //@flow
-import type { Size } from './index';
-import Point from './geometry/point';
+import type { Size } from '../index';
+import Point from '../geometry/point';
+import { System } from '../entityManager';
 import anime from 'animejs';
 import _ from 'lodash';
 import {
@@ -10,11 +11,11 @@ import {
   ZOOM_INTERVAL,
   ZOOM_MIN,
   ZOOM_MAX,
-} from './constants';
+} from '../constants';
 
 
 // TODO: factor out into an entity with components controlled by a system
-export default class Viewport {
+export default class ViewportSystem extends System {
   isPanning: boolean;
   sceneSize: Size;
   viewportSize: Size;
@@ -29,6 +30,7 @@ export default class Viewport {
   cellHover: ?Point;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
+    super();
     this.sceneSize = sceneSize;
     this.viewportSize = viewportSize;
     this.panLocation = null;
@@ -83,7 +85,7 @@ export default class Viewport {
     });
   }
 
-  tick() {
+  update() {
     this.checkBoardHover();
     this.checkKeysPressed();
   }

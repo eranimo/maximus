@@ -1,18 +1,17 @@
 // @flow
 import { System } from '../entityManager';
-import type Viewport from '../viewport';
+import type ViewportSystem from './viewport';
 import type EntityManager, { ComponentClass } from '../entityManager';
 
 
 // base class for any System that handles RenderComponents
 export default class RenderSystem extends System {
-  viewport: Viewport;
+  viewport: ViewportSystem;
   ctx: CanvasRenderingContext2D;
 
-  constructor(manager: EntityManager, viewport: Viewport, ctx: CanvasRenderingContext2D) {
-    super(manager);
-    this.viewport = viewport;
-    this.ctx = ctx;
+  init() {
+    this.ctx = this.systems.region.ctx;
+    this.viewport = this.systems.viewport;
   }
 
   update() {

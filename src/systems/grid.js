@@ -1,6 +1,5 @@
 // @flow
 import { System } from '../entityManager';
-import type EventManager from '../entityManager';
 import { MapPosition } from '../components/position';
 import { SCENE_CELLS_WIDTH, SCENE_CELLS_HEIGHT } from '../constants';
 import GridWorker from 'worker-loader!../workers/gridWorker';
@@ -15,8 +14,8 @@ export default class GridSystem extends System {
   activeCell: MapPosition;
   worker: GridWorker;
 
-  constructor(manager: EventManager) {
-    super(manager);
+  constructor() {
+    super();
 
     this.worker = new GridWorker();
     this.worker.postMessage({

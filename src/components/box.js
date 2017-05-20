@@ -2,7 +2,6 @@
 import { Component } from '../entityManager';
 import Point from '../geometry/point';
 import Rectangle from '../geometry/rectangle';
-import Viewport from '../viewport';
 import { CELL_SIZE } from '../constants';
 import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
@@ -24,12 +23,13 @@ export class Box extends Component {
     cell: 'MapPosition',
   }
 
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw() {
+    const { ctx } = this.systems.region;
     const { color, opacity } = this.state;
     const { position: { x, y } } = this.cell.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
 
-    const intersect = viewport.calculateBounds(
+    const intersect = this.systems.viewport.calculateBounds(
       new Point(x * CELL_SIZE, y * CELL_SIZE),
       CELL_SIZE,
       CELL_SIZE,

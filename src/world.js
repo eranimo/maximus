@@ -1,17 +1,16 @@
 // @flow
-import Viewport from './viewport';
-import Region from './region';
 import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
-  SCENE_CELLS_WIDTH,
-  SCENE_CELLS_HEIGHT,
   CELL_SIZE
 } from './constants';
 import EntityManager from './entityManager';
 import Point from './geometry/point';
+
+import ViewportSystem from './systems/viewport';
+import RegionSystem from './systems/region';
 import DisplaySystem from './systems/display';
 import MinimapUISystem from './systems/minimapUI';
 import EventSystem from './systems/event';
@@ -28,41 +27,28 @@ import Person from './entities/person';
 export default class World {
   canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
-
-  viewport: Viewport;
-  region: Region;
-
   manager: EntityManager;
 
-  eventSystem: EventSystem;
-  displaySystem: DisplaySystem;
-  minimapUISystem: MinimapUISystem;
-  uiSystem: UISystem;
-  gridSystem: GridSystem;
-  timeSystem: TimeSystem;
-
   constructor({ main }: { main: HTMLElement }) {
-    this.viewport = new Viewport({
-      width: SCENE_WIDTH,
-      height: SCENE_HEIGHT
-    }, {
-      width: VIEWPORT_WIDTH,
-      height: VIEWPORT_HEIGHT,
-    }, main);
+    this.manager = new EntityManager({
+      viewport: new ViewportSystem({
+        width: SCENE_WIDTH,
+        height: SCENE_HEIGHT
+      }, {
+        width: VIEWPORT_WIDTH,
+        height: VIEWPORT_HEIGHT,
+      }, main),
+      region: new RegionSystem(main),
+      time: new TimeSystem(),
+      display: new DisplaySystem(),
+      event: new EventSystem(),
+      minimap: new MinimapUISystem(),
+      ui: new UISystem(),
+      grid: new GridSystem(),
+    });
     window.canvas = main;
-    window.viewport = this.viewport;
-    this.region = new Region(this, main, this.viewport);
 
-    this.manager = new EntityManager();
-
-    this.timeSystem = new TimeSystem(this.manager);
-    this.eventSystem = new EventSystem(this.manager, this.viewport, (this.region.canvas: any));
-    this.displaySystem = new DisplaySystem(this.manager, this.viewport, this.region.ctx);
-    this.minimapUISystem = new MinimapUISystem(this.manager, this.viewport, this.region.ctx);
-    this.uiSystem = new UISystem(this.manager, this.viewport, this.region.ctx);
-    this.gridSystem = new GridSystem(this.manager);
-
-    window.time = this.timeSystem;
+    window.systems = this.manager.systems;
 
     this.manager.addEntity(Building, {
       position: new Point(10, 10)
@@ -87,28 +73,23 @@ export default class World {
   }
 
   draw(timeSinceLastUpdate: number) {
-    this.region.draw(timeSinceLastUpdate, this.timeSystem.time);
-    this.displaySystem.draw();
-    this.uiSystem.draw();
-    this.minimapUISystem.draw();
+    for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
+      system.draw(timeSinceLastUpdate);
+    }
   }
 
   update() {
     this.manager.on(VIEWPORT_JUMP, (value: Object) => {
-      this.viewport.jump(value.point);
+      this.manager.systems.viewport.jump(value.point);
     });
     this.manager.update();
-    this.viewport.tick();
-    this.manager.update();
-    this.eventSystem.update();
-    this.displaySystem.update();
-    this.uiSystem.update();
-    this.minimapUISystem.update();
-    this.gridSystem.update();
-    this.timeSystem.update();
+    for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
+      system.update();
+    }
   }
 
   loop() {
+    const timeSystem = this.manager.systems.time;
     const VIDEO_FPS = 60;
     const refreshDelay = 1000 / VIDEO_FPS;
     let timeOfLastExecution;
@@ -128,7 +109,7 @@ export default class World {
       if (timeSinceLastUpdate >= refreshDelay) {
         this.update();
 
-        this.timeSystem.time = this.timeSystem.time + (timeSinceLastUpdate * this.timeSystem.speed);
+        timeSystem.time = timeSystem.time + (timeSinceLastUpdate * timeSystem.speed);
       }
       this.draw(timeSinceLastUpdate);
       timeSinceLastUpdate = 0;

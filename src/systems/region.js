@@ -1,30 +1,35 @@
 //@flow
-import type Viewport from './viewport';
-import Point from './geometry/point';
-import type World from './world';
+import type ViewportSystem from './viewport';
+import Point from '../geometry/point';
+import type World from '../world';
+import { System } from '../entityManager';
+import type EntityManager from '../entityManager';
 import _ from 'lodash';
 import {
   CELL_SIZE,
   SCENE_CELLS_WIDTH,
   SCENE_CELLS_HEIGHT,
-} from './constants';
+} from '../constants';
 
 
 // TODO: factor out into an entity with components controlled by a system
-export default class Region {
+export default class Region extends System {
   world: World;
   ctx: CanvasRenderingContext2D;
   canvas: HTMLElement;
-  viewport: Viewport;
   boardRect: Object;
+  viewport: ViewportSystem;
 
-  constructor(world: World, canvas: HTMLElement, viewport: Viewport) {
-    this.world = world;
+  constructor(canvas: HTMLElement) {
+    super();
     this.canvas = canvas;
-    this.viewport = viewport;
+  }
+
+  init() {
+    this.viewport = this.systems.viewport;
 
     // $FlowFixMe
-    this.ctx = canvas.getContext('2d');
+    this.ctx = this.canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.translate(0.5, 0.5);
   }
@@ -36,8 +41,7 @@ export default class Region {
     };
   }
 
-  draw(timeSinceLastUpdate: number, time: number) {
-    const ctx = this.ctx;
+  draw(timeSinceLastUpdate: number) {
     const viewport = this.viewport;
 
     this.ctx.fillStyle = 'white';
@@ -79,18 +83,18 @@ export default class Region {
     }
 
     const cursor = viewport.cursorLocation;
-    ctx.font = '20px sans-serif';
-    ctx.fillStyle = '#333';
-    ctx.fillText(`Cursor: (${cursor.x}, ${cursor.y})`, 0, 20);
+    this.ctx.font = '20px sans-serif';
+    this.ctx.fillStyle = '#333';
+    this.ctx.fillText(`Cursor: (${cursor.x}, ${cursor.y})`, 0, 20);
     const cursorWorld = viewport.viewportToWorld(viewport.cursorLocation);
-    ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
-    ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
-    ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
+    this.ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
+    this.ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
+    this.ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
     if (viewport.cellHover){
-      ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
+      this.ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
     }
-    ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
-    ctx.fillText(`Time Δ (s): (${Math.round(time / 1000)})`, 0, 7 * 20);
+    this.ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
+    this.ctx.fillText(`Time Δ (s): (${Math.round(this.systems.time.time / 1000)})`, 0, 7 * 20);
 
 
     // draw hover cell

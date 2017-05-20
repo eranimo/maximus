@@ -1,6 +1,5 @@
 import { Component } from '../entityManager';
 import Point from '../geometry/point';
-import Viewport from '../viewport';
 import type RenderComponent from './render';
 import { CELL_SIZE } from '../constants';
 
@@ -14,7 +13,7 @@ export class ViewportText extends Component implements RenderComponent {
     color: string,
   };
 
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw(ctx: CanvasRenderingContext2D) {
     const { position: { x, y}, text, color, font } = this.state;
     ctx.font = font;
     ctx.fillStyle = color;
@@ -33,12 +32,13 @@ export class WorldText extends Component implements RenderComponent {
     shadow: boolean,
   };
 
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw() {
+    const ctx = this.systems.region.ctx;
     const { position, text, color, font, size } = this.state;
-    const { x, y } = viewport.worldToViewport(
+    const { x, y } = this.systems.viewport.worldToViewport(
       position.multiply(CELL_SIZE).add(CELL_SIZE / 2)
     );
-    const fontSize = viewport.toZoom(size);
+    const fontSize = this.systems.viewport.toZoom(size);
     ctx.save();
     ctx.font = `${fontSize}px ${font}`;
     ctx.textAlign = 'center';
