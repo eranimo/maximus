@@ -173,7 +173,7 @@ export default class EntityManager {
     for (const entity of this.entities) {
       for (const instance: ComponentClass of entity.components) {
         if (instance.waitUntilTime) {
-          if (this.systems.TimeSystem.time > instance.waitUntilTime) {
+          if (this.systems.time.time > instance.waitUntilTime) {
             delete instance.waitUntilTime;
             instance.update();
           }

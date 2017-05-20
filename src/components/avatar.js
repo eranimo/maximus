@@ -22,25 +22,28 @@ export class Avatar extends Component {
     pos: 'MapPosition',
   }
 
+  get radius(): number {
+    return this.systems.viewport.toZoom(CELL_SIZE / 2);
+  }
+
   draw() {
     const { ctx } = this.systems.region;
     const { color, opacity } = this.state;
-    const { position: { x, y } } = this.pos.state;
+    const { position } = this.pos.state;
     ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
     ctx.lineWidth = 1;
 
     const intersect = this.systems.viewport.calculateBounds(
-      new Point(x * CELL_SIZE, y * CELL_SIZE),
+      position.multiply(CELL_SIZE),
       CELL_SIZE,
       CELL_SIZE,
     );
     if (intersect) {
       ctx.beginPath();
-      const half = this.systems.viewport.toZoom(CELL_SIZE / 2);
       ctx.arc(
-        intersect.topLeft.x + half,
-        intersect.topLeft.y + half,
-        half * 0.75,
+        intersect.topLeft.x + this.radius,
+        intersect.topLeft.y + this.radius,
+        this.radius * 0.75,
         0,
         2 * Math.PI,
       );
@@ -50,7 +53,6 @@ export class Avatar extends Component {
   }
 
   update() {
-    const speed = this.systems.time.speed;
-    // this.pos.state.position.x += 0.01 * speed;
+    this.systems.viewport.jump(this.pos.state.position.multiply(CELL_SIZE).add(this.radius));
   }
 }

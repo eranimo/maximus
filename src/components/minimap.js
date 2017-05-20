@@ -12,7 +12,6 @@ import EventTrigger from './eventTrigger';
 import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
 import { VIEWPORT_JUMP } from '../events';
-import type Viewport from '../viewport';
 import Color from '../utils/color';
 import type { MapPosition } from './position';
 
@@ -33,7 +32,8 @@ export class MinimapPoint extends Component {
     cell: 'MapPosition',
   };
 
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw() {
+    const { ctx } = this.systems.region;
     const { position: { x, y } } = this.cell.state;
     const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
     if (!logic) {
@@ -114,7 +114,8 @@ export class MinimapLogic extends EventTrigger {
 
 // background of the minimap
 export class MinimapBackdrop extends Component {
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw() {
+    const { ctx } = this.systems.region;
     const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
     if (!logic) {
       throw new Error('Could not find MinimapLogic component');
@@ -136,7 +137,8 @@ export class MinimapBackdrop extends Component {
 
 // minimap frame that represent's the viewport's current view
 export class MinimapFrame extends Component {
-  draw(viewport: Viewport, ctx: CanvasRenderingContext2D) {
+  draw() {
+    const { ctx } = this.systems.region;
     const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
     if (!logic) {
       throw new Error('Could not find MinimapLogic component');
@@ -149,10 +151,10 @@ export class MinimapFrame extends Component {
     ctx.beginPath();
     ctx.strokeStyle = 'red';
     ctx.lineWidth = 1;
-    const { width, height } = viewport.getViewportRealSize();
+    const { width, height } = this.systems.viewport.getViewportRealSize();
     ctx.rect(
-      logic.bounds.position.x + 1.0 + Math.round((-viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
-      logic.bounds.position.y + 1.0 + Math.round((-viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
+      logic.bounds.position.x + 1.0 + Math.round((-this.systems.viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
+      logic.bounds.position.y + 1.0 + Math.round((-this.systems.viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
       Math.round(MINIMAP_WIDTH * (width / SCENE_WIDTH)),
       Math.round(MINIMAP_HEIGHT * (height / SCENE_HEIGHT)),
     );

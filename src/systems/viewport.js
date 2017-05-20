@@ -14,7 +14,6 @@ import {
 } from '../constants';
 
 
-// TODO: factor out into an entity with components controlled by a system
 export default class ViewportSystem extends System {
   isPanning: boolean;
   sceneSize: Size;
