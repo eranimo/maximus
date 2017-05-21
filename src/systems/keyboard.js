@@ -4,6 +4,7 @@ import { System } from '../entityManager';
 const keyCodes = {
   shift: 16,
   space: 32,
+  enter: 13,
 };
 
 export default class KeyboardSystem extends System {

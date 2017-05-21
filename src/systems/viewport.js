@@ -50,14 +50,6 @@ export default class ViewportSystem extends System {
     this.canvas.addEventListener('mousemove', this.panMove.bind(this));
     this.canvas.addEventListener('mouseout', this.handleMouseOut.bind(this));
     this.canvas.addEventListener('wheel', this.handleZoom.bind(this));
-    document.addEventListener('keyup', (event: KeyboardEvent) => {
-      this.keysPressed[event.keyCode] = false;
-      this.handleKeyup(event);
-    });
-    document.addEventListener('keydown', (event: KeyboardEvent) => {
-      this.keysPressed[event.keyCode] = true;
-    });
-
     this.onMovement();
   }
 
@@ -94,16 +86,11 @@ export default class ViewportSystem extends System {
     if (this.following) {
       this.systems.viewport.jump(this.following.state.position.multiply(CELL_SIZE));
     }
-  }
 
-  isKeyPressed(keyCode: number): boolean {
-    return this.keysPressed[keyCode] === true;
-  }
-
-  handleKeyup(event: KeyboardEvent) {
-    if (event.keyCode === 32) {
+    // on space bar press, reset zoom level
+    if (this.systems.keyboard.isKeyPressed('space')) {
       this.changeZoomLevel(1, this.cursorLocation.x, this.cursorLocation.y);
-    } else if (event.keyCode === 13) {
+    } else if (this.systems.keyboard.isKeyPressed('enter')) {
       this.travel({
         x: SCENE_WIDTH / 2,
         y: SCENE_WIDTH / 2,
@@ -126,19 +113,20 @@ export default class ViewportSystem extends System {
   checkKeysPressed(): boolean {
     const delta = this.fromZoom(15);
     let didSomething: boolean = false;
-    if (this.isKeyPressed(38) || this.isKeyPressed(87)) { // up
+    const keyboard = this.systems.keyboard;
+    if (keyboard.isCodePressed(38) || keyboard.isCodePressed(87)) { // up
       this.move(0, delta);
       didSomething = true;
     }
-    if (this.isKeyPressed(40) || this.isKeyPressed(83)) { // down
+    if (keyboard.isCodePressed(40) || keyboard.isCodePressed(83)) { // down
       this.move(0, -delta);
       didSomething = true;
     }
-    if (this.isKeyPressed(37) || this.isKeyPressed(65)) { // left
+    if (keyboard.isCodePressed(37) || keyboard.isCodePressed(65)) { // left
       this.move(delta, 0);
       didSomething = true;
     }
-    if (this.isKeyPressed(39) || this.isKeyPressed(68)) { // right
+    if (keyboard.isCodePressed(39) || keyboard.isCodePressed(68)) { // right
       this.move(-delta, 0);
       didSomething = true;
     }
