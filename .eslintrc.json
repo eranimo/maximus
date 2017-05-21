@@ -26,12 +26,13 @@
   "rules": {
     "semi": 2,
     "no-console": 0,
-    "no-unused-vars": 1,
+    "no-unused-vars": 0,
     "flowtype/use-flow-type": 1,
     "flowtype/object-type-delimiter": 2,
     "flowtype/space-before-type-colon": 2,
     "flowtype/require-parameter-type": 2,
     "flowtype/require-return-type": 2,
-    "flowtype/require-variable-type": 0
+    "flowtype/require-variable-type": 0,
+    "react/jsx-uses-vars": 1
   }
 }

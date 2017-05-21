@@ -34,3 +34,19 @@ canvas {
 * {
   box-sizing: border-box;
 }
+
+.selection {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 200px;
+  width: 300px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid black;
+  border-bottom: none;
+  border-left: none;
+  font-family: Helvetica;
+  padding: 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

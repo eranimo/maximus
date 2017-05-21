@@ -15,7 +15,8 @@ System:
 
 */
 
-let currentID = 0;
+let currentComponentID = 0;
+let currentEntityID = 0;
 
 export class Component {
   id: number;
@@ -27,8 +28,8 @@ export class Component {
 
   constructor(options: Object = {}) {
     this.state = Object.assign({}, this.constructor.initialState, options);
-    this.id = currentID;
-    currentID++;
+    this.id = currentComponentID;
+    currentComponentID++;
   }
   init() {}
   update() {}
@@ -46,10 +47,13 @@ export class Entity {
   name: ?string;
   manager: EntityManager;
   components: Array<ComponentClass>;
+  id: number;
 
   constructor(name: ?string) {
     this.name = name;
     this.components = [];
+    this.id = currentComponentID;
+    currentComponentID++;
   }
 
   addComponent(instance: ComponentClass) {

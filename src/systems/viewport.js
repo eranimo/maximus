@@ -12,6 +12,7 @@ import {
   ZOOM_MIN,
   ZOOM_MAX,
 } from '../constants';
+import type { MapPosition } from '../components/position';
 
 
 export default class ViewportSystem extends System {
@@ -27,6 +28,7 @@ export default class ViewportSystem extends System {
   topLeft: Point;
   bottomRight: Point;
   cellHover: ?Point;
+  following: ?MapPosition;
 
   constructor(sceneSize: Size, viewportSize: Size, canvas: HTMLElement) {
     super();
@@ -38,6 +40,7 @@ export default class ViewportSystem extends System {
     this.offset = { x: 0, y: 0 };
     this.cursorLocation = { x: 0, y: 0 };
     this.keysPressed = {};
+    this.following = null;
 
     this.canvas.style.cursor = 'pointer';
     // TODO: factor out all event handling into the event system
@@ -88,6 +91,9 @@ export default class ViewportSystem extends System {
   update() {
     this.checkBoardHover();
     this.checkKeysPressed();
+    if (this.following) {
+      this.systems.viewport.jump(this.following.state.position.multiply(CELL_SIZE));
+    }
   }
 
   isKeyPressed(keyCode: number): boolean {

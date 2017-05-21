@@ -2,8 +2,10 @@
 import { System } from '../entityManager';
 import type { Entity } from '../entityManager';
 
+
 export default class SelectionSystem extends System {
   selected: Set<Entity>;
+  canvas: HTMLElement;
 
   init() {
     this.selected = new Set();
@@ -19,6 +21,7 @@ export default class SelectionSystem extends System {
     }
     console.log(`Selected '${name}'`);
     this.selected.add(entity);
+    // this.renderDOM();
   }
 
   deselect(entity: Entity) {
@@ -29,10 +32,12 @@ export default class SelectionSystem extends System {
       return;
     }
     console.warn(`Entity ${name} is not selected`);
+    // this.renderDOM();
   }
 
   deselectAll() {
     this.selected = new Set();
+    // this.renderDOM();
   }
 
   toggle(entity: Entity) {
@@ -51,6 +56,7 @@ export default class SelectionSystem extends System {
     } else {
       this.select(entity);
     }
+    // this.renderDOM();
   }
 
   draw() {

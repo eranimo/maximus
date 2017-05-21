@@ -24,12 +24,14 @@ import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
 import Minimap from './entities/minimap';
 import Person from './entities/person';
+import initUI from './ui';
 
 
 export default class World {
   canvas: HTMLElement;
   ctx: CanvasRenderingContext2D;
   manager: EntityManager;
+  uiState: Object;
 
   constructor({ main }: { main: HTMLElement }) {
     this.manager = new EntityManager({
@@ -79,6 +81,7 @@ export default class World {
 
     this.manager.addEntity(Minimap);
     window.manager = this.manager;
+    this.uiState = {};
   }
 
   draw(timeSinceLastUpdate: number) {
@@ -95,6 +98,7 @@ export default class World {
     for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
       system.update();
     }
+    initUI(this.manager);
   }
 
   loop() {
