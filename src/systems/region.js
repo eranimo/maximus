@@ -23,6 +23,10 @@ export default class Region extends System {
   constructor(canvas: HTMLElement) {
     super();
     this.canvas = canvas;
+    this.canvas.addEventListener('contextmenu', (event: Event): boolean => {
+      event.preventDefault();
+      return false;
+    }, false);
   }
 
   init() {

@@ -209,19 +209,32 @@ export default class ViewportSystem extends System {
     });
   }
 
-  panUp() {
+  shouldPan(event: MouseEvent): boolean {
+    return event.which === 1 && event.shiftKey === false;
+  }
+
+  panUp(event: MouseEvent) {
+    if (!this.shouldPan(event)) {
+      return;
+    }
     this.isPanning = false;
     this.panLocation = null;
     this.canvas.style.cursor = 'pointer';
   }
 
-  panDown(event: Object) {
+  panDown(event: MouseEvent) {
+    if (!this.shouldPan(event)) {
+      return;
+    }
     this.isPanning = true;
     this.panLocation = { x: event.offsetX, y: event.offsetY };
     this.canvas.style.cursor = 'move';
   }
 
-  panMove(event: Object) {
+  panMove(event: MouseEvent) {
+    if (!this.shouldPan(event)) {
+      return;
+    }
     if (this.isPanning && this.panLocation) {
       const diff = {
         x: (this.panLocation.x - event.offsetX) / -1,
