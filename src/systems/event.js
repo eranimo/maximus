@@ -16,12 +16,14 @@ export default class EventSystem extends System {
   canvas: HTMLCanvasElement;
   activeEvents: Array<Event>;
   mouseMoveComponents: Set<ComponentClass>;
+  mouseClickLocations: Map<ComponentClass, Point>;
 
   init() {
     this.viewport = this.systems.viewport;
     this.canvas = this.systems.region.canvas;
     this.activeEvents = [];
     this.mouseMoveComponents = new Set();
+    this.mouseClickLocations = new Map();
 
     this.canvas.addEventListener('mousedown', this.handleEvent.bind(this));
     this.canvas.addEventListener('mousemove', this.handleEvent.bind(this));
@@ -38,7 +40,10 @@ export default class EventSystem extends System {
     const { offsetX: x, offsetY: y } = event;
     const viewportPoint = new Point(x, y);
     const worldPoint: Point = this.viewport.viewportToWorld(viewportPoint);
-    this.getComponents().forEach((comp: ComponentClass): void => callback(comp, viewportPoint, worldPoint));
+    this.getComponents().forEach((comp: ComponentClass) => {
+      const whichPoint = comp.constructor.eventType === 'viewport' ? viewportPoint : worldPoint;
+      callback(comp, whichPoint);
+    });
   }
 
   update() {
@@ -68,17 +73,22 @@ export default class EventSystem extends System {
   }
 
   handleMouseDown(event: MouseEvent) {
-    this.processEvent(event, (comp: ComponentClass, viewportPoint: Point, worldPoint: Point) => {
+    this.processEvent(event, (comp: ComponentClass, point: Point) => {
+      this.mouseClickLocations.set(comp, point);
       if (this.mouseMoveComponents.has(comp) && comp.onMouseDown) {
-        comp.onMouseDown(viewportPoint);
+        comp.onMouseDown(point);
       }
     });
   }
 
   handleMouseUp(event: MouseEvent) {
+    const { isPanning } = this.systems.viewport;
     this.processEvent(event, (comp: ComponentClass, point: Point) => {
-      if (this.mouseMoveComponents.has(comp) && comp.onMouseUp) {
-        comp.trigger('onMouseUp', [point]);
+      if (this.mouseMoveComponents.has(comp) && comp.onMouseUp && !isPanning) {
+        // $FlowFixMe
+        if (this.mouseClickLocations.has(comp) && this.mouseClickLocations.get(comp).equals(point)) {
+          comp.trigger('onMouseUp', [point]);
+        }
       }
     });
   }
@@ -92,22 +102,21 @@ export default class EventSystem extends System {
   }
 
   handleMouseMove(event: MouseEvent) {
-    this.processEvent(event, (comp: ComponentClass, viewportPoint: Point, worldPoint: Point) => {
-      const whichPoint = comp.constructor.eventType === 'viewport' ? viewportPoint : worldPoint;
+    this.processEvent(event, (comp: ComponentClass, point: Point) => {
       if (!comp.bounds) {
         throw new Error(`Component ${comp.constructor.name} does not have a bounds property`);
       }
-      const isAtComponent = comp.bounds.containsPoint(whichPoint);
+      const isAtComponent = comp.bounds.containsPoint(point);
       if (this.mouseMoveComponents.has(comp) && !isAtComponent) {
-        comp.trigger('onMouseLeave', [whichPoint]);
+        comp.trigger('onMouseLeave', [point]);
       }
 
       if (!this.mouseMoveComponents.has(comp) && isAtComponent) {
-        comp.trigger('onMouseEnter', [whichPoint]);
+        comp.trigger('onMouseEnter', [point]);
       }
 
       if (isAtComponent) {
-        comp.trigger('onMouseMove', [whichPoint]);
+        comp.trigger('onMouseMove', [point]);
         this.mouseMoveComponents.add(comp);
       } else {
         this.mouseMoveComponents.delete(comp);
