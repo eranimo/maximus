@@ -12,6 +12,13 @@ export default class Rectangle {
     this.height = height;
   }
 
+  get centroid(): Point {
+    return new Point(
+      (this.x1 + this.x2) / 2,
+      (this.y1 + this.y2) / 2,
+    );
+  }
+
   get x1(): number {
     return this.position.x;
   }

@@ -14,6 +14,13 @@ export default class Circle {
     this.radius = radius;
   }
 
+  get centroid(): Point {
+    return new Point(
+      this.center.x + this.radius,
+      this.center.y + this.radius,
+    );
+  }
+
   static fromPoint(point: Point, radius: number): Circle {
     const avatar: Point = new Circle(null, null, radius);
     avatar.center = point;

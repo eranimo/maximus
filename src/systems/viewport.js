@@ -84,7 +84,7 @@ export default class ViewportSystem extends System {
     this.checkBoardHover();
     this.checkKeysPressed();
     if (this.following) {
-      this.systems.viewport.jump(this.following.state.position.multiply(CELL_SIZE));
+      this.systems.viewport.jump(this.following.bounds.centroid);
     }
 
     // on space bar press, reset zoom level
@@ -213,8 +213,15 @@ export default class ViewportSystem extends System {
     return event.which === 1 && event.shiftKey === false;
   }
 
+  get canPan(): boolean {
+    return !this.following;
+  }
+
   panUp(event: MouseEvent) {
     if (!this.shouldPan(event)) {
+      return;
+    }
+    if (!this.canPan) {
       return;
     }
     this.isPanning = false;
@@ -226,6 +233,9 @@ export default class ViewportSystem extends System {
     if (!this.shouldPan(event)) {
       return;
     }
+    if (!this.canPan) {
+      this.following = null;
+    }
     this.isPanning = true;
     this.panLocation = { x: event.offsetX, y: event.offsetY };
     this.canvas.style.cursor = 'move';
@@ -233,6 +243,10 @@ export default class ViewportSystem extends System {
 
   panMove(event: MouseEvent) {
     if (!this.shouldPan(event)) {
+      return;
+    }
+    if (!this.canPan) {
+      this.canvas.style.cursor = 'pointer';
       return;
     }
     if (this.isPanning && this.panLocation) {

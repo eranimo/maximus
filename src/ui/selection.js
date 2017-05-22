@@ -28,13 +28,19 @@ class Selection extends PureComponent {
     return () => {
       const { manager } = this.props;
       const position = entity.getComponents('MapPosition')[0];
-      manager.systems.viewport.jump(position.state.position.multiply(CELL_SIZE));
+      manager.systems.viewport.jump(position.bounds.centroid);
     };
   }
 
   handleDeselect = (): Function => {
     return () => {
       this.props.manager.systems.selection.deselectAll();
+    };
+  }
+
+  handleUnselect = (entity: Entity): Function => {
+    return () => {
+      this.props.manager.systems.selection.deselect(entity);
     };
   }
 
@@ -60,6 +66,7 @@ class Selection extends PureComponent {
             <button onClick={this.handleFollow(entity)}>
               {this.isFollowing(entity) ? 'Unfolow' : 'Follow'}
             </button>
+            <button onClick={this.handleUnselect(entity)}>X</button>
           </span>
         </div>
       );
