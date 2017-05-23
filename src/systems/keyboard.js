@@ -5,6 +5,7 @@ const keyCodes = {
   shift: 16,
   space: 32,
   enter: 13,
+  escape: 27,
 };
 
 export default class KeyboardSystem extends System {

@@ -74,11 +74,9 @@ class Selection extends PureComponent {
 
     return (
       <div className="selection">
-        # Selected: {selected.size} - <button onClick={this.handleDeselect()}>X</button>
+        Selected: {selected.size} - <button onClick={this.handleDeselect()}>X</button>
         <hr />
         {selectedRows}
-        <hr />
-        {!!this.props.following}
       </div>
     );
   }

@@ -11,6 +11,12 @@ export default class SelectionSystem extends System {
     this.selected = new Set();
   }
 
+  update() {
+    if (this.systems.keyboard.isKeyPressed('escape')) {
+      this.deselectAll();
+    }
+  }
+
   select(entity: Entity) {
     const name = entity.name || 'No Name';
     if (!entity.hasComponent('MapPosition')) {
