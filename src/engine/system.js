@@ -1,6 +1,6 @@
 // @flow
 import type { ComponentClass } from './component';
-import type EntityManager from './engine/entityManager';
+import type EntityManager from './entityManager';
 
 
 export default class System {
