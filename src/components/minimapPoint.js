@@ -14,7 +14,7 @@ import { VIEWPORT_MOVE } from '../events';
 
 const POINT_SIZE = MINIMAP_WIDTH / SCENE_CELLS_WIDTH;
 // renders a point on the minimap
-export class MinimapPoint extends Component {
+export default class MinimapPoint extends Component {
   state: {
     position: Point,
     color: Color,

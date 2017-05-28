@@ -1,5 +1,5 @@
 // @flow
-import { MinimapPoint } from '../components/minimap';
+import MinimapPoint from '../components/minimapPoint';
 import Layer from '../misc/layer';
 import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';

@@ -3,7 +3,7 @@ import type { EntityType } from '../engine/entity';
 import Color from '../utils/color';
 import Point from '../geometry/point';
 import { Tile, BoxTrigger } from '../components/tile';
-import { MinimapPoint } from '../components/minimap';
+import MinimapPoint from '../components/minimapPoint';
 import { WorldText } from '../components/ui';
 import { MapPosition } from '../components/position';
 import { random } from 'lodash';
