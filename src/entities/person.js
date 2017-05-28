@@ -20,7 +20,9 @@ const Person: EntityType = {
     new Avatar({
       color: new Color(255, 0, 0)
     }),
-    new MinimapPoint(),
+    new MinimapPoint({
+      isStatic: false,
+    }),
     new Walk(),
   ])
 };

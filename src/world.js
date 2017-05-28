@@ -23,7 +23,7 @@ import SelectionSystem from './systems/selection';
 import KeyboardSystem from './systems/keyboard';
 import MovementSystem from './systems/movement';
 
-import { VIEWPORT_JUMP } from './events';
+import { VIEWPORT_MOVE } from './events';
 import Building from './entities/building';
 import Person from './entities/person';
 import initUI from './ui';
@@ -84,10 +84,6 @@ export default class World {
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
     this.manager.refresh();
     window.manager = this.manager;
-
-    this.manager.on(VIEWPORT_JUMP, (event: Object) => {
-      this.manager.systems.viewport.jump(event.point);
-    });
   }
 
   draw(timeSinceLastUpdate: number) {

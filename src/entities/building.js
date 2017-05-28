@@ -49,6 +49,7 @@ const Building: EntityType = {
       new Tile(sprite),
       new MinimapPoint({
         color: sprite.color,
+        isStatic: true,
       }),
       // new WorldText({
       //   font: 'sans-serif',

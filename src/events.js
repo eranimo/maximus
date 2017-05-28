@@ -1,1 +1,1 @@
-export const VIEWPORT_JUMP = 'VIEWPORT_JUMP';
+export const VIEWPORT_MOVE = 'VIEWPORT_MOVE';

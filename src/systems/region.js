@@ -3,7 +3,7 @@ import type ViewportSystem from './viewport';
 import Point from '../geometry/point';
 import type World from '../world';
 import System from '../engine/system';
-import type EntityManager from '../engine/entityManager';
+import { VIEWPORT_MOVE } from '../events';
 import _ from 'lodash';
 import {
   CELL_SIZE,
@@ -19,7 +19,6 @@ export default class Region extends System {
   gridLayer: Layer;
   terrainLayer: Layer;
   mainLayer: Layer;
-  minimapLayer: Layer;
 
   boardRect: Object;
   viewport: ViewportSystem;
@@ -31,8 +30,10 @@ export default class Region extends System {
     this.terrainLayer = new Layer('terrain', 1);
     this.gridLayer = new Layer('grid', 2);
     this.mainLayer = new Layer('main', 3);
-    this.minimapLayer = new Layer('minimap', 4);
-    console.log(this.mainLayer);
+
+    this.systems.viewport.on(VIEWPORT_MOVE, () => {
+      this.terrainLayer.clear();
+    });
   }
 
   get boardRect(): Object {
@@ -43,10 +44,8 @@ export default class Region extends System {
   }
 
   draw(timeSinceLastUpdate: number) {
-    this.terrainLayer.clear();
     this.gridLayer.clear();
     this.mainLayer.clear();
-    this.minimapLayer.clear();
 
     // this.drawGrid();
     this.drawDevInfo(timeSinceLastUpdate);

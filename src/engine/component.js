@@ -13,6 +13,7 @@ export default class Component extends EventEmitter {
   entity: Entity;
   state: Object;
   waitUntilTime: ?number;
+  shouldDraw: boolean;
 
   static initialState = {};
 
@@ -20,6 +21,7 @@ export default class Component extends EventEmitter {
     super();
     this.state = Object.assign({}, this.constructor.initialState, options);
     this.id = currentComponentID;
+    this.shouldDraw = true;
     currentComponentID++;
   }
   init() {}

@@ -14,6 +14,7 @@ export default class System extends EventEmitter {
     this.getComponents().forEach((comp: ComponentClass) => {
       this.components.add(comp);
     });
+    this.emit('refetch');
   }
 
   get systems(): { [string]: $Subtype<System> } {

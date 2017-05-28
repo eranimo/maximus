@@ -12,8 +12,14 @@ export default class MovementSystem extends System {
   components: Set<Walk>;
 
   update() {
+    const currentTime = this.systems.time.time;
     for (const comp: ComponentClass of this.components) {
-      comp.update();
+      if (!comp.waitUntilTime || currentTime > comp.waitUntilTime) {
+        if (comp.waitUntilTime) {
+          delete comp.waitUntilTime;
+        }
+        comp.update();
+      }
     }
   }
 }

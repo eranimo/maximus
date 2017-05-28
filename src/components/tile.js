@@ -6,6 +6,7 @@ import { CELL_SIZE } from '../constants';
 import EventTrigger from './eventTrigger';
 import Color from '../utils/color';
 import type { MapPosition } from './position';
+import { VIEWPORT_MOVE } from '../events';
 
 
 export class Tile extends Component {
@@ -28,9 +29,19 @@ export class Tile extends Component {
   init() {
     const { position: { x, y } } = this.cell.state;
     this.position = new Point(x * CELL_SIZE, y * CELL_SIZE);
+    this.shouldDraw = true;
+
+    this.systems.viewport.on(VIEWPORT_MOVE, () => {
+      this.shouldDraw = true;
+    });
   }
 
   draw() {
+    if (!this.shouldDraw) {
+      return;
+    }
+    this.shouldDraw = false;
+
     const { ctx } = this.systems.region.terrainLayer;
     const { spritemap, row, col } = this.state;
     const { image, size } = this.resources.spritemaps[spritemap];

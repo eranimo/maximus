@@ -14,6 +14,7 @@ import {
   ZOOM_DEFAULT,
 } from '../constants';
 import type { MapPosition } from '../components/position';
+import { VIEWPORT_MOVE } from '../events';
 
 
 export default class ViewportSystem extends System {
@@ -79,6 +80,8 @@ export default class ViewportSystem extends System {
       x: this.viewportSize.width,
       y: this.viewportSize.height
     });
+
+    this.emit(VIEWPORT_MOVE);
   }
 
   update() {

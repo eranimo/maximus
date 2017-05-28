@@ -11,7 +11,7 @@ import {
   SCENE_WIDTH,
   SCENE_HEIGHT,
 } from '../constants';
-import { VIEWPORT_JUMP } from '../events';
+import { VIEWPORT_MOVE } from '../events';
 
 
 // handles rendering minimap components
@@ -19,13 +19,25 @@ export default class MinimapUISystem extends System {
   static componentTypes = [
     MinimapPoint,
   ];
-  layer: Layer;
+  borderLayer: Layer;
+  staticLayer: Layer;
+  movingLayer: Layer;
+  frameLayer: Layer;
+
+
   bounds: Rectangle;
   isPanning: boolean;
+  shouldDrawStatics: boolean;
+  staticComponents: Set<ComponentClass>;
+  movingComponents: Set<ComponentClass>;
 
   constructor() {
     super();
-    this.layer = new Layer('minimap', 4, false);
+    this.borderLayer = new Layer('minimap-border', 4, false);
+    this.staticLayer = new Layer('minimap-statics', 5, false);
+    this.movingLayer = new Layer('minimap-main', 6, false);
+    this.frameLayer = new Layer('minimap-frame', 7, false);
+
     this.bounds = new Rectangle(
       new Point(
         window.innerWidth - MINIMAP_WIDTH,
@@ -34,6 +46,9 @@ export default class MinimapUISystem extends System {
       MINIMAP_WIDTH + 2,
       MINIMAP_HEIGHT + 2
     );
+
+    this.staticComponents = new Set();
+    this.movingComponents = new Set();
   }
 
   init() {
@@ -42,6 +57,24 @@ export default class MinimapUISystem extends System {
     eventLayer.addEventListener('mousemove', this.onMouseMove.bind(this));
     eventLayer.addEventListener('mouseup', this.onMouseUp.bind(this));
     eventLayer.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+
+    this.shouldDrawStatics = true;
+    this.systems.viewport.on(VIEWPORT_MOVE, () => {
+      this.shouldDrawStatics = true;
+      this.staticLayer.clear();
+    });
+
+    this.on('refetch', this.onRefetch);
+  }
+
+  onRefetch() {
+    for (const comp: ComponentClass of this.components) {
+      if (comp.state.isStatic) {
+        this.staticComponents.add(comp);
+      } else {
+        this.movingComponents.add(comp);
+      }
+    }
   }
 
   update() {
@@ -50,10 +83,8 @@ export default class MinimapUISystem extends System {
     }
   }
 
-  draw() {
-    this.layer.clear();
-    const { ctx } = this.layer;
-
+  drawBorder() {
+    const { ctx } = this.borderLayer;
     ctx.beginPath();
     ctx.fillStyle = 'white';
     ctx.strokeStyle = '#000';
@@ -65,27 +96,61 @@ export default class MinimapUISystem extends System {
       MINIMAP_HEIGHT,
     );
     ctx.stroke();
-    ctx.fill();
+  }
 
-    for (const comp: ComponentClass of this.components) {
-      comp.draw();
+  drawStatic() {
+    for (const comp: ComponentClass of this.staticComponents) {
+      comp.draw(this.staticLayer.ctx);
     }
+  }
 
-    ctx.save();
+  drawMoving() {
+    for (const comp: ComponentClass of this.movingComponents) {
+      comp.draw(this.movingLayer.ctx);
+    }
+  }
+
+  drawFrame() {
+    const { ctx } = this.frameLayer;
+
+    ctx.rect(
+      0 + Math.round(this.bounds.position.x),
+      0 + Math.round(this.bounds.position.y),
+      MINIMAP_WIDTH,
+      MINIMAP_HEIGHT,
+    );
     ctx.clip();
 
     ctx.beginPath();
-    ctx.strokeStyle = 'red';
+    ctx.strokeStyle = 'black';
     ctx.lineWidth = 1;
     const { width, height } = this.systems.viewport.getViewportRealSize();
     ctx.rect(
-      this.bounds.position.x + 1.0 + Math.round((-this.systems.viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
-      this.bounds.position.y + 1.0 + Math.round((-this.systems.viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
+      0.5 + Math.round(this.bounds.position.x + (-this.systems.viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
+      0.5 + Math.round(this.bounds.position.y + (-this.systems.viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
       Math.round(MINIMAP_WIDTH * (width / SCENE_WIDTH)),
       Math.round(MINIMAP_HEIGHT * (height / SCENE_HEIGHT)),
     );
     ctx.stroke();
-    ctx.restore();
+  }
+
+  draw() {
+    if (this.shouldDrawStatics) {
+      this.borderLayer.clear();
+      this.drawBorder();
+
+      this.staticLayer.clear();
+      this.drawStatic();
+    }
+
+    this.movingLayer.clear();
+    this.drawMoving();
+
+    if (this.shouldDrawStatics) {
+      this.frameLayer.clear();
+      this.drawFrame();
+      this.shouldDrawStatics = false;
+    }
   }
 
   onMouseDown(event: MouseEvent) {
