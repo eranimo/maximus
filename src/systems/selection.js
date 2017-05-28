@@ -1,6 +1,6 @@
 // @flow
-import { System } from '../entityManager';
-import type { Entity } from '../entityManager';
+import System from '../engine/system';
+import type Entity from '../engine/entity';
 
 
 export default class SelectionSystem extends System {

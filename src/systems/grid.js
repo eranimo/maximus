@@ -1,5 +1,5 @@
 // @flow
-import { System } from '../entityManager';
+import System from '../engine/system';
 import { MapPosition } from '../components/position';
 import { SCENE_CELLS_WIDTH, SCENE_CELLS_HEIGHT } from '../constants';
 import GridWorker from 'worker-loader!../workers/gridWorker';

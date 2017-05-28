@@ -8,7 +8,7 @@ import {
   VIEWPORT_HEIGHT,
   CELL_SIZE
 } from './constants';
-import EntityManager from './entityManager';
+import EntityManager from './engine/entityManager';
 import Point from './geometry/point';
 
 import ViewportSystem from './systems/viewport';

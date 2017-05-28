@@ -1,7 +1,7 @@
 // @flow
-import type { ComponentClass } from '../entityManager';
+import type { ComponentClass } from '../engine/component';
 import { Walk } from '../components/walk';
-import { System } from '../entityManager';
+import System from '../engine/system';
 
 
 // a system that displays all world entities

@@ -1,7 +1,7 @@
 // @flow
 import React, { PureComponent } from 'react';
-import type { Entity } from '../entityManager';
-import type EntityManager from '../entityManager';
+import type Entity from '../engine/entity';
+import type EntityManager from '../engine/entityManager';
 import { CELL_SIZE } from '../constants';
 
 

@@ -1,6 +1,6 @@
 // @flow
-import { System } from '../entityManager';
-import type EntityManager from '../entityManager';
+import System from '../engine/system';
+import type EntityManager from '../engine/entityManager';
 
 
 // base class for any System that handles RenderComponents

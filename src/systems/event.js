@@ -1,6 +1,6 @@
 // @flow
-import { System } from '../entityManager';
-import type { ComponentClass } from '../entityManager';
+import System from '../engine/system';
+import type { ComponentClass } from '../engine/component';
 import EventTrigger from '../components/eventTrigger';
 import Point from '../geometry/point';
 import Viewport from './viewport';

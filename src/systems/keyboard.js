@@ -1,5 +1,5 @@
 // @flow
-import { System } from '../entityManager';
+import System from '../engine/system';
 
 const keyCodes = {
   shift: 16,

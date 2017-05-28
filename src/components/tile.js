@@ -1,5 +1,5 @@
 // @flow
-import { Component } from '../entityManager';
+import Component from '../engine/component';
 import Point from '../geometry/point';
 import Rectangle from '../geometry/rectangle';
 import { CELL_SIZE } from '../constants';

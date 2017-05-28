@@ -2,8 +2,8 @@
 import type ViewportSystem from './viewport';
 import Point from '../geometry/point';
 import type World from '../world';
-import { System } from '../entityManager';
-import type EntityManager from '../entityManager';
+import System from '../engine/system';
+import type EntityManager from '../engine/entityManager';
 import _ from 'lodash';
 import {
   CELL_SIZE,

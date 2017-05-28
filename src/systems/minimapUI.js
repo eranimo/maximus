@@ -3,8 +3,8 @@ import { MinimapPoint } from '../components/minimap';
 import Layer from '../misc/layer';
 import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
-import { System } from '../entityManager';
-import type { ComponentClass } from '../entityManager';
+import System from '../engine/system';
+import type { ComponentClass } from '../engine/component';
 import {
   MINIMAP_WIDTH,
   MINIMAP_HEIGHT,

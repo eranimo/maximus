@@ -1,5 +1,5 @@
 // @flow
-import { Component } from '../entityManager';
+import Component from '../engine/component';
 
 
 export default class EventTrigger extends Component {

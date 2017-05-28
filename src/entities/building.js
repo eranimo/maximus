@@ -1,5 +1,5 @@
 // @flow
-import type { EntityType } from '../entityManager';
+import type { EntityType } from '../engine/entity';
 import Color from '../utils/color';
 import Point from '../geometry/point';
 import { Tile, BoxTrigger } from '../components/tile';

@@ -1,5 +1,5 @@
 // @flow
-import { Component } from '../entityManager';
+import Component from '../engine/component';
 import {
   SCENE_CELLS_WIDTH,
   SCENE_CELLS_HEIGHT,

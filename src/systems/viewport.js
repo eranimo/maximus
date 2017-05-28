@@ -1,7 +1,7 @@
 //@flow
 import type { Size } from '../index';
 import Point from '../geometry/point';
-import { System } from '../entityManager';
+import System from '../engine/system';
 import anime from 'animejs';
 import _ from 'lodash';
 import {

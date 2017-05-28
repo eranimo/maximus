@@ -1,6 +1,6 @@
 // @flow
 import { inRange } from 'lodash';
-import { Component } from '../entityManager';
+import Component from '../engine/component';
 import { CELL_SIZE } from '../constants';
 import Point from '../geometry/point';
 import type { MapPosition } from './position';
