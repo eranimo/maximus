@@ -14,7 +14,7 @@ let sprites = [
     spritemap: 'main',
     row: 6,
     col: 1,
-    color: new Color(175, 161, 73),
+    color: new Color(185, 141, 73),
   },
   {
     spritemap: 'main',
