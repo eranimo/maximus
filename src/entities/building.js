@@ -22,7 +22,9 @@ const Building: EntityType = {
         row: 4,
         col: 2,
       }),
-      // new MinimapPoint(),
+      new MinimapPoint({
+        color: new Color(195, 151, 83),
+      }),
       // new WorldText({
       //   font: 'sans-serif',
       //   size: 7,

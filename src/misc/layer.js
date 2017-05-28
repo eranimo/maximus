@@ -11,7 +11,7 @@ export default class Layer {
   width: number;
   height: number;
 
-  constructor(name: string, zIndex: number = 1) {
+  constructor(name: string, zIndex: number = 1, smooth = true) {
     const canvas = document.createElement('canvas');
     canvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
     canvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
@@ -26,8 +26,11 @@ export default class Layer {
     if (!ctx) {
       throw new Error('Could not create canvas context');
     }
-    ctx.imageSmoothingEnabled = false;
-    ctx.translate(0.5, 0.5);
+
+    if (smooth) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.translate(0.5, 0.5);
+    }
 
     window.addEventListener('resize', () => {
       this.width = window.innerWidth;

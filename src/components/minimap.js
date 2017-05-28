@@ -5,13 +5,8 @@ import {
   SCENE_CELLS_HEIGHT,
   MINIMAP_WIDTH,
   MINIMAP_HEIGHT,
-  SCENE_WIDTH,
-  SCENE_HEIGHT,
 } from '../constants';
-import EventTrigger from './eventTrigger';
-import Rectangle from '../geometry/rectangle';
 import Point from '../geometry/point';
-import { VIEWPORT_JUMP } from '../events';
 import Color from '../utils/color';
 import type { MapPosition } from './position';
 
@@ -32,15 +27,21 @@ export class MinimapPoint extends Component {
     cell: 'MapPosition',
   };
 
+  fillStyle: string;
+
+  init() {
+    this.fillStyle = this.state.color.toRGBA();
+  }
+
   draw() {
     const { ctx } = this.systems.minimap.layer;
     const { position: { x, y } } = this.cell.state;
-    const { position } = this.systems.minimap.bounds;
 
-    ctx.fillStyle = this.state.color.toRGBA();
+    const { bounds } = this.systems.minimap;
+    ctx.fillStyle = this.fillStyle;
     ctx.fillRect(
-      0.5 + position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
-      0.5 + position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
+      0.5 + bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
+      0.5 + bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
       1,
       1,
     );

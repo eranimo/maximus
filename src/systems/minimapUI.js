@@ -25,7 +25,7 @@ export default class MinimapUISystem extends System {
 
   constructor() {
     super();
-    this.layer = new Layer('minimap', 4);
+    this.layer = new Layer('minimap', 4, false);
     this.bounds = new Rectangle(
       new Point(
         window.innerWidth - MINIMAP_WIDTH,
