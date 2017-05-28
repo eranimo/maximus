@@ -349,8 +349,8 @@ export default class ViewportSystem extends System {
       this.isInViewport(this.worldToViewport(loc3)) ||
       this.isInViewport(this.worldToViewport(loc4))
     ) {
-      const topLeft = this.worldToViewport(loc);
-      const bottomRight = this.worldToViewport(loc2);
+      const topLeft = this.worldToViewport(loc).round();
+      const bottomRight = this.worldToViewport(loc2).round();
       const newWidth = bottomRight.x - topLeft.x;
       const newHeight = bottomRight.y - topLeft.y;
       return { topLeft, width: newWidth, height: newHeight };

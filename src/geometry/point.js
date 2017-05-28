@@ -1,4 +1,4 @@
-import { random, inRange } from 'lodash';
+import { random, inRange, round } from 'lodash';
 
 
 export default class Point {
@@ -19,6 +19,13 @@ export default class Point {
     return new Point(
       random(maxX),
       random(maxY),
+    );
+  }
+
+  round(precision: number = 0): Point {
+    return new Point(
+      round(this.x, precision),
+      round(this.y, precision),
     );
   }
 

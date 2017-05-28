@@ -11,7 +11,7 @@ export default class Layer {
   width: number;
   height: number;
 
-  constructor(name: string, zIndex: number = 1, smooth = true) {
+  constructor(name: string, zIndex: number = 1, smooth: boolean = true) {
     const canvas = document.createElement('canvas');
     canvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
     canvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);

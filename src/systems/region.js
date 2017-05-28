@@ -48,7 +48,7 @@ export default class Region extends System {
     this.mainLayer.clear();
     this.minimapLayer.clear();
 
-    this.drawGrid();
+    // this.drawGrid();
     this.drawDevInfo(timeSinceLastUpdate);
     // draw hover cell
     // this.drawCursor();
@@ -146,8 +146,8 @@ export default class Region extends System {
 
   drawGridLine(from: Point, to: Point) {
     this.gridLayer.ctx.beginPath();
-    this.gridLayer.ctx.strokeStyle = 'rgba(30, 30, 30, 0.5)';
-    this.gridLayer.ctx.lineWidth = this.viewport.toZoom(0.1);
+    this.gridLayer.ctx.strokeStyle = 'rgba(30, 30, 30, 1)';
+    this.gridLayer.ctx.lineWidth = this.viewport.toZoom(0.5);
     this.gridLayer.ctx.moveTo(
       Math.round(to.x),
       Math.round(to.y),
