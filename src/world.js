@@ -25,7 +25,6 @@ import MovementSystem from './systems/movement';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
-import Minimap from './entities/minimap';
 import Person from './entities/person';
 import initUI from './ui';
 
@@ -83,7 +82,6 @@ export default class World {
     });
     const walk = person.getComponents('Walk');
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
-    this.manager.addEntity(Minimap);
     this.manager.refresh();
     window.manager = this.manager;
   }
