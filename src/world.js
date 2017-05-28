@@ -33,7 +33,7 @@ export default class World {
   manager: EntityManager;
   uiState: Object;
 
-  constructor({ main }: { main: HTMLElement }) {
+  constructor({ main, resources }: { main: HTMLElement, resources: Object }) {
     this.manager = new EntityManager({
       viewport: new ViewportSystem({
         width: SCENE_WIDTH,
@@ -51,7 +51,7 @@ export default class World {
       grid: new GridSystem(),
       selection: new SelectionSystem(),
       keyboard: new KeyboardSystem(),
-    });
+    }, resources);
     window.canvas = main;
 
     window.systems = this.manager.systems;

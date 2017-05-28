@@ -41,6 +41,10 @@ export class Component {
   get systems(): { [string]: $Subtype<System> } {
     return this.entity.manager.systems;
   }
+
+  get resources(): Object {
+    return this.entity.manager.resources;
+  }
 }
 
 export class Entity {
@@ -120,11 +124,13 @@ export default class EntityManager {
   events: Set<GameEvent>;
   systems: { [string]: $Subtype<System> };
   eventListeners: Map<string, Array<Function>>;
+  resources: Object;
 
-  constructor(systems: { [string]: $Subtype<System> }) {
+  constructor(systems: { [string]: $Subtype<System> }, resources: Object) {
     this.componentInstances = [];
     this.entities = [];
     this.systems = systems;
+    this.resources = resources;
     console.log(this.systems);
     for (const [name, system]: [string, any] of Object.entries(this.systems)) {
       system.manager = this;

@@ -5,6 +5,7 @@ import {
   VIEWPORT_WIDTH,
   VIEWPORT_HEIGHT,
 } from './constants';
+import loadTilemap from './misc/tilemap';
 
 
 export type Cell = {
@@ -26,8 +27,18 @@ window.onload = () => {
   mainCanvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
   mainCanvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
 
-  const world: World = new World({
-    main: mainCanvas,
-  });
-  world.loop();
+  loadTilemap()
+    .then((sprites: Object) => {
+      console.log(sprites);
+      const world: World = new World({
+        main: mainCanvas,
+        resources: {
+          sprites
+        }
+      });
+      world.loop();
+    })
+    .catch((error: Error) => {
+      console.error(error);
+    });
 };

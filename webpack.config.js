@@ -24,8 +24,11 @@ module.exports = function(env) {
           use: [ 'style-loader', 'css-loader' ]
         },
         {
-          test: /\.png$/,
-          use: { loader: 'url-loader', options: { limit: 100000 } },
+          test: /\.(jpg|png|svg)$/,
+          loader: 'file-loader',
+          options: {
+            name: '[path][name].[hash].[ext]',
+          },
         },
         {
           test: /\.jpg$/,

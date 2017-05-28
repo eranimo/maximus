@@ -16,7 +16,7 @@ export class Tile extends Component {
   cell: MapPosition;
 
   static initialState = {
-    color: new Color(0, 0, 255),
+    sprite: new Color(0, 0, 255),
     opacity: 1,
   }
   static dependencies = {
@@ -25,9 +25,8 @@ export class Tile extends Component {
 
   draw() {
     const { ctx } = this.systems.region;
-    const { color, opacity } = this.state;
+    const { sprite } = this.state;
     const { position: { x, y } } = this.cell.state;
-    ctx.fillStyle = color.setAlpha(opacity).toRGBA(opacity);
 
     const intersect = this.systems.viewport.calculateBounds(
       new Point(x * CELL_SIZE, y * CELL_SIZE),
@@ -35,12 +34,20 @@ export class Tile extends Component {
       CELL_SIZE,
     );
     if (intersect) {
-      ctx.fillRect(
+      const image = this.resources.sprites[sprite].image;
+      ctx.drawImage(
+        image,
         intersect.topLeft.x,
         intersect.topLeft.y,
         intersect.width,
         intersect.height,
       );
+      // ctx.fillRect(
+      //   intersect.topLeft.x,
+      //   intersect.topLeft.y,
+      //   intersect.width,
+      //   intersect.height,
+      // );
     }
   }
 }

@@ -18,17 +18,17 @@ const Building: EntityType = {
         type: 'world',
       }),
       new Tile({
-        color: new Color(0, 0, 255)
+        sprite: 'desert',
       }),
       new MinimapPoint(),
-      new WorldText({
-        font: 'sans-serif',
-        size: 7,
-        color: '#C0C0C0',
-        shadow: true,
-        text: `${position.x},${position.y}`,
-        position: position,
-      }),
+      // new WorldText({
+      //   font: 'sans-serif',
+      //   size: 7,
+      //   color: '#C0C0C0',
+      //   shadow: true,
+      //   text: `${position.x},${position.y}`,
+      //   position: position,
+      // }),
       new BoxTrigger({
         type: 'world',
       }),
