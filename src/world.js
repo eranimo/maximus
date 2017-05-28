@@ -15,7 +15,7 @@ import ViewportSystem from './systems/viewport';
 import RegionSystem from './systems/region';
 import DisplaySystem from './systems/display';
 import MinimapUISystem from './systems/minimapUI';
-import EventSystem from './systems/event';
+import MouseEventSystem from './systems/mouseEvent';
 import UISystem from './systems/ui';
 import GridSystem from './systems/grid';
 import TimeSystem from './systems/time';
@@ -47,7 +47,7 @@ export default class World {
       region: new RegionSystem(),
       time: new TimeSystem(),
       display: new DisplaySystem(),
-      event: new EventSystem(),
+      mouseEvents: new MouseEventSystem(),
       minimap: new MinimapUISystem(),
       ui: new UISystem(),
       grid: new GridSystem(),

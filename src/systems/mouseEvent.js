@@ -7,7 +7,7 @@ import Viewport from './viewport';
 
 
 // a system that handles browser events passed to components
-export default class EventSystem extends System {
+export default class MouseEventSystem extends System {
   static componentTypes = [
     EventTrigger,
   ];
