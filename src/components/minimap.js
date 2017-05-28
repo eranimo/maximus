@@ -32,8 +32,9 @@ export class MinimapPoint extends Component {
   static dependencies = {
     cell: 'MapPosition',
   };
+
   draw() {
-    const { ctx } = this.systems.region.mainLayer;
+    const { ctx } = this.systems.minimap.minimapLayer;
     const { position: { x, y } } = this.cell.state;
     if (!this.logic) {
       const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
@@ -120,7 +121,7 @@ export class MinimapBackdrop extends Component {
   logic: MinimapLogic;
 
   draw() {
-    const { ctx } = this.systems.region.mainLayer;
+    const { ctx } = this.systems.minimap.minimapLayer;
     if (!this.logic) {
       const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
       if (!logic) {
@@ -148,7 +149,7 @@ export class MinimapFrame extends Component {
   logic: MinimapLogic;
 
   draw() {
-    const { ctx } = this.systems.region.mainLayer;
+    const { ctx } = this.systems.minimap.minimapLayer;
     if (!this.logic) {
       const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
       if (!logic) {

@@ -45,7 +45,7 @@ export default class World {
         width: VIEWPORT_WIDTH,
         height: VIEWPORT_HEIGHT,
       }, main),
-      region: new RegionSystem(main),
+      region: new RegionSystem(),
       time: new TimeSystem(),
       display: new DisplaySystem(),
       event: new EventSystem(),
@@ -72,7 +72,7 @@ export default class World {
       }
     }
 
-    const someone = this.manager.addEntity(Person, {
+    this.manager.addEntity(Person, {
       position: new Point(16, 15),
       name: 'person_0',
     });
@@ -83,15 +83,13 @@ export default class World {
     });
     const walk = person.getComponents('Walk');
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
-    this.manager.systems.movement.refetch();
     this.manager.refresh();
     this.manager.addEntity(Minimap);
     window.manager = this.manager;
-    this.uiState = {};
   }
 
   draw(timeSinceLastUpdate: number) {
-    for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
+    for (const system: any of Object.values(this.manager.systems)) {
       system.draw(timeSinceLastUpdate);
     }
   }
@@ -100,8 +98,8 @@ export default class World {
     this.manager.on(VIEWPORT_JUMP, (value: Object) => {
       this.manager.systems.viewport.jump(value.point);
     });
-    //this.manager.update();
-    for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
+    // this.manager.update();
+    for (const system: any of Object.values(this.manager.systems)) {
       system.update();
     }
     initUI(this.manager);

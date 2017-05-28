@@ -9,57 +9,8 @@ import {
   CELL_SIZE,
   SCENE_CELLS_WIDTH,
   SCENE_CELLS_HEIGHT,
-  VIEWPORT_WIDTH,
-  VIEWPORT_HEIGHT,
 } from '../constants';
-
-
-class Layer {
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
-  width: number;
-  height: number;
-
-  constructor(name: string, zIndex: number = 1) {
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
-    canvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
-    canvas.setAttribute('id', name);
-    canvas.style.zIndex = `${zIndex}`;
-    canvas.addEventListener('contextmenu', (event: Event): boolean => {
-      event.preventDefault();
-      return false;
-    }, false);
-
-    const ctx = (canvas: HTMLCanvasElement).getContext('2d');
-    if (!ctx) {
-      throw new Error('Could not create canvas context');
-    }
-    ctx.imageSmoothingEnabled = false;
-    ctx.translate(0.5, 0.5);
-
-    window.addEventListener('resize', () => {
-      this.width = window.innerWidth;
-      this.height = window.innerHeight;
-      canvas.setAttribute('width', `${this.width}px`);
-      canvas.setAttribute('height', `${this.height}px`);
-    });
-
-    this.canvas = canvas;
-    this.ctx = ctx;
-
-    this.width = VIEWPORT_WIDTH;
-    this.height = VIEWPORT_HEIGHT;
-
-    // $FlowFixMe
-    document.body.appendChild(canvas);
-  }
-
-  clear() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-  }
-}
-
+import Layer from '../misc/layer';
 
 
 export default class Region extends System {
@@ -69,10 +20,11 @@ export default class Region extends System {
   mainLayer: Layer;
   boardRect: Object;
   viewport: ViewportSystem;
+  options: Object;
 
   init() {
     this.viewport = this.systems.viewport;
-
+    this.options = {};
     this.terrainLayer = new Layer('terrain', 1);
     this.gridLayer = new Layer('grid', 2);
     this.mainLayer = new Layer('main', 3);
@@ -87,13 +39,35 @@ export default class Region extends System {
   }
 
   draw(timeSinceLastUpdate: number) {
-    const viewport = this.viewport;
-
     this.terrainLayer.clear();
     this.gridLayer.clear();
     this.mainLayer.clear();
 
+    this.drawGrid();
+    this.drawDevInfo(timeSinceLastUpdate);
+    // draw hover cell
+    // this.drawCursor();
+  }
 
+  drawDevInfo(timeSinceLastUpdate: number) {
+    const viewport = this.viewport;
+
+    const cursor = viewport.cursorLocation;
+    this.gridLayer.ctx.font = '20px sans-serif';
+    this.gridLayer.ctx.fillStyle = '#333';
+    this.gridLayer.ctx.fillText(`Cursor: (${cursor.x}, ${cursor.y})`, 0, 20);
+    const cursorWorld = viewport.viewportToWorld(viewport.cursorLocation);
+    this.gridLayer.ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
+    this.gridLayer.ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
+    this.gridLayer.ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
+    if (viewport.cellHover){
+      this.gridLayer.ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
+    }
+    this.gridLayer.ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
+    this.gridLayer.ctx.fillText(`Time Δ (s): (${Math.round(this.systems.time.time / 1000)})`, 0, 7 * 20);
+  }
+
+  drawGrid() {
     // grid
     for (let x = 0; x <= SCENE_CELLS_WIDTH; x++) {
       let pointFrom: Point = new Point(x * CELL_SIZE, 0);
@@ -126,24 +100,6 @@ export default class Region extends System {
         this.drawGridLine(intersect.from, intersect.to);
       }
     }
-
-    const cursor = viewport.cursorLocation;
-    this.gridLayer.ctx.font = '20px sans-serif';
-    this.gridLayer.ctx.fillStyle = '#333';
-    this.gridLayer.ctx.fillText(`Cursor: (${cursor.x}, ${cursor.y})`, 0, 20);
-    const cursorWorld = viewport.viewportToWorld(viewport.cursorLocation);
-    this.gridLayer.ctx.fillText(`World: (${cursorWorld.x}, ${cursorWorld.y})`, 0, 2 * 20);
-    this.gridLayer.ctx.fillText(`Top Left: (${viewport.topLeft.x}, ${viewport.topLeft.y})`, 0, 3 * 20);
-    this.gridLayer.ctx.fillText(`Bottom Right: (${viewport.bottomRight.x}, ${viewport.bottomRight.y})`, 0, 4 * 20);
-    if (viewport.cellHover){
-      this.gridLayer.ctx.fillText(`Cell Hover: (${viewport.cellHover.x}, ${viewport.cellHover.y})`, 0, 5 * 20);
-    }
-    this.gridLayer.ctx.fillText(`ms/frame: (${timeSinceLastUpdate})`, 0, 6 * 20);
-    this.gridLayer.ctx.fillText(`Time Δ (s): (${Math.round(this.systems.time.time / 1000)})`, 0, 7 * 20);
-
-
-    // draw hover cell
-    // this.drawCursor();
   }
 
   drawCursor() {
@@ -185,15 +141,15 @@ export default class Region extends System {
 
   drawGridLine(from: Point, to: Point) {
     this.gridLayer.ctx.beginPath();
-    this.gridLayer.ctx.strokeStyle = 'rgba(30, 30, 30, 1)';
-    this.gridLayer.ctx.lineWidth = this.viewport.toZoom(0.5);
+    this.gridLayer.ctx.strokeStyle = 'rgba(30, 30, 30, 0.5)';
+    this.gridLayer.ctx.lineWidth = this.viewport.toZoom(0.1);
     this.gridLayer.ctx.moveTo(
-      0 + Math.round(to.x),
-      0 + Math.round(to.y),
+      Math.round(to.x),
+      Math.round(to.y),
     );
     this.gridLayer.ctx.lineTo(
-      0 + Math.round(from.x),
-      0 + Math.round(from.y),
+      Math.round(from.x),
+      Math.round(from.y),
     );
     this.gridLayer.ctx.stroke();
   }
