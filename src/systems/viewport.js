@@ -90,7 +90,7 @@ export default class ViewportSystem extends System {
 
     // on space bar press, reset zoom level
     if (this.systems.keyboard.isKeyPressed('space')) {
-      this.changeZoomLevel(1, this.cursorLocation.x, this.cursorLocation.y);
+      this.changeZoomLevel(ZOOM_DEFAULT, this.cursorLocation.x, this.cursorLocation.y);
     } else if (this.systems.keyboard.isKeyPressed('enter')) {
       this.travel({
         x: SCENE_WIDTH / 2,
