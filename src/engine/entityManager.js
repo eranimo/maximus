@@ -3,22 +3,17 @@ import type { ComponentClass } from './component';
 import Entity from './entity';
 import type System from './system';
 import type Component from './component';
+import EventEmitter from 'eventemitter3';
 
 
-export type GameEvent = {
-  name: string,
-  value: Object,
-};
-
-export default class EntityManager {
+export default class EntityManager extends EventEmitter {
   entities: Array<Entity>;
   componentInstances: Array<ComponentClass>;
-  events: Set<GameEvent>;
   systems: { [string]: $Subtype<System> };
-  eventListeners: Map<string, Array<Function>>;
   resources: Object;
 
   constructor(systems: { [string]: $Subtype<System> }, resources: Object) {
+    super();
     this.componentInstances = [];
     this.entities = [];
     this.systems = systems;
@@ -29,8 +24,6 @@ export default class EntityManager {
       system.init();
       system.refetch();
     }
-    this.events = new Set();
-    this.eventListeners = new Map();
   }
 
   refresh() {
@@ -73,38 +66,5 @@ export default class EntityManager {
       components.push(...comps);
     }
     return components;
-  }
-
-  emitEvent(event: GameEvent) {
-    this.events.add(event);
-  }
-
-  // update all entities
-  update() {
-    if (this.events.size > 0) {
-      for (const event: GameEvent of this.events) {
-        if (this.eventListeners.has(event.name)) {
-          const listeners: ?Array<Function> = this.eventListeners.get(event.name);
-          if (listeners) {
-            for (const listener: Function of listeners) {
-              listener(event.value);
-              this.events.delete(event);
-            }
-          }
-        }
-      }
-    }
-    // this.events = new Set();
-  }
-
-  on(eventName: string, listener: Function) {
-    if (this.eventListeners.has(eventName)) {
-      this.eventListeners.set(eventName, [
-        ...this.eventListeners.get(eventName) || [],
-        listener
-      ]);
-    } else {
-      this.eventListeners.set(eventName, [listener]);
-    }
   }
 }

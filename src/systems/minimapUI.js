@@ -100,12 +100,7 @@ export default class MinimapUISystem extends System {
       x: Math.round(((point.x - this.bounds.position.x) / MINIMAP_WIDTH) * SCENE_WIDTH),
       y: Math.round(((point.y - this.bounds.position.y) / MINIMAP_HEIGHT) * SCENE_HEIGHT),
     });
-    this.manager.emitEvent({
-      name: VIEWPORT_JUMP,
-      value: {
-        point: worldPoint
-      }
-    });
+    this.manager.systems.viewport.jump(worldPoint);
   }
 
   onMouseLeave() {
@@ -134,12 +129,7 @@ export default class MinimapUISystem extends System {
       y: Math.round(((point.y - this.bounds.position.y) / MINIMAP_HEIGHT) * SCENE_HEIGHT),
     });
     if (this.isPanning) {
-      this.manager.emitEvent({
-        name: VIEWPORT_JUMP,
-        value: {
-          point: worldPoint
-        }
-      });
+      this.manager.systems.viewport.jump(worldPoint);
     }
   }
 }

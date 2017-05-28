@@ -1,9 +1,10 @@
 // @flow
 import type { ComponentClass } from './component';
 import type EntityManager from './entityManager';
+import EventEmitter from 'eventemitter3';
 
 
-export default class System {
+export default class System extends EventEmitter {
   manager: EntityManager;
   components: Set<ComponentClass>;
   static componentTypes: Array<Class<ComponentClass>> = [];

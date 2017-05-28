@@ -1,14 +1,14 @@
 // @flow
 import type System from './system';
 import type Entity from './entity';
-import type { GameEvent } from './entityManager';
+import EventEmitter from 'eventemitter3';
 
 
 let currentComponentID = 0;
 
 export type ComponentClass = $Subtype<Component>;
 
-export default class Component {
+export default class Component extends EventEmitter {
   id: number;
   entity: Entity;
   state: Object;
@@ -17,16 +17,13 @@ export default class Component {
   static initialState = {};
 
   constructor(options: Object = {}) {
+    super();
     this.state = Object.assign({}, this.constructor.initialState, options);
     this.id = currentComponentID;
     currentComponentID++;
   }
   init() {}
   update() {}
-  sendEvent(event: GameEvent) {
-    this.entity.manager.emitEvent(event);
-  }
-  on(event: GameEvent) {} // eslint-disable-line
 
   get systems(): { [string]: $Subtype<System> } {
     return this.entity.manager.systems;

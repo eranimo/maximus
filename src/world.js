@@ -84,6 +84,10 @@ export default class World {
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
     this.manager.refresh();
     window.manager = this.manager;
+
+    this.manager.on(VIEWPORT_JUMP, (event: Object) => {
+      this.manager.systems.viewport.jump(event.point);
+    });
   }
 
   draw(timeSinceLastUpdate: number) {
@@ -93,10 +97,7 @@ export default class World {
   }
 
   update() {
-    this.manager.on(VIEWPORT_JUMP, (value: Object) => {
-      this.manager.systems.viewport.jump(value.point);
-    });
-    this.manager.update();
+    // this.manager.update();
     for (const system: any of Object.values(this.manager.systems)) {
       system.update();
     }
