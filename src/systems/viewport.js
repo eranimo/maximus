@@ -153,7 +153,7 @@ export default class ViewportSystem extends System {
     const mag: number = Math.abs(event.deltaY);
     event.preventDefault();
     const { offsetX: x, offsetY: y } = event;
-    if (direction === 'down') {
+    if (direction === 'up') {
       this.changeZoomLevel(this.zoomLevel + (mag * ZOOM_INTERVAL), x, y);
     } else {
       this.changeZoomLevel(this.zoomLevel - (mag * ZOOM_INTERVAL), x, y);
