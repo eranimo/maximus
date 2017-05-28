@@ -21,6 +21,7 @@ import GridSystem from './systems/grid';
 import TimeSystem from './systems/time';
 import SelectionSystem from './systems/selection';
 import KeyboardSystem from './systems/keyboard';
+import MovementSystem from './systems/movement';
 
 import { VIEWPORT_JUMP } from './events';
 import Building from './entities/building';
@@ -53,6 +54,7 @@ export default class World {
       grid: new GridSystem(),
       selection: new SelectionSystem(),
       keyboard: new KeyboardSystem(),
+      movement: new MovementSystem(),
     }, resources);
     window.canvas = main;
 
@@ -81,8 +83,8 @@ export default class World {
     });
     const walk = person.getComponents('Walk');
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
-    console.log(walk);
-
+    this.manager.systems.movement.refetch();
+    this.manager.refresh();
     this.manager.addEntity(Minimap);
     window.manager = this.manager;
     this.uiState = {};
@@ -98,7 +100,7 @@ export default class World {
     this.manager.on(VIEWPORT_JUMP, (value: Object) => {
       this.manager.systems.viewport.jump(value.point);
     });
-    this.manager.update();
+    //this.manager.update();
     for (const [name, system]: [string, any] of Object.entries(this.manager.systems)) {
       system.update();
     }

@@ -31,20 +31,9 @@ export class Tile extends Component {
   }
 
   draw() {
-    // console.time('draw tile');
-    const { ctx } = this.systems.region;
+    const { ctx } = this.systems.region.terrainLayer;
     const { spritemap, row, col } = this.state;
     const { image, size } = this.resources.spritemaps[spritemap];
-
-    // const { position } = this.cell.state;
-    // const drawPosition = this.systems.viewport.worldToViewport(position.multiply(CELL_SIZE));
-    // ctx.drawImage(
-    //   image,
-    //   drawPosition.x,
-    //   drawPosition.y,
-    //   this.systems.viewport.toZoom(CELL_SIZE),
-    //   this.systems.viewport.toZoom(CELL_SIZE),
-    // );
 
     const intersect = this.systems.viewport.calculateBounds(
       this.position,
@@ -63,14 +52,7 @@ export class Tile extends Component {
         intersect.width,
         intersect.height,
       );
-      // ctx.fillRect(
-      //   intersect.topLeft.x,
-      //   intersect.topLeft.y,
-      //   intersect.width,
-      //   intersect.height,
-      // );
     }
-    // console.timeEnd('draw tile');
   }
 }
 

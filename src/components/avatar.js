@@ -27,7 +27,7 @@ export class Avatar extends Component {
   }
 
   draw() {
-    const { ctx } = this.systems.region;
+    const { ctx } = this.systems.region.mainLayer;
     const { color, isHover } = this.state;
     const opacity = isHover ? 0.5 : 1;
     const { position } = this.pos.state;

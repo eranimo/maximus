@@ -11,6 +11,7 @@ import {
   ZOOM_INTERVAL,
   ZOOM_MIN,
   ZOOM_MAX,
+  ZOOM_DEFAULT,
 } from '../constants';
 import type { MapPosition } from '../components/position';
 
@@ -36,7 +37,7 @@ export default class ViewportSystem extends System {
     this.viewportSize = viewportSize;
     this.panLocation = null;
     this.canvas = canvas;
-    this.zoomLevel = 1;
+    this.zoomLevel = ZOOM_DEFAULT;
     this.offset = { x: 0, y: 0 };
     this.cursorLocation = { x: 0, y: 0 };
     this.keysPressed = {};

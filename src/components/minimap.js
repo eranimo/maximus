@@ -33,7 +33,7 @@ export class MinimapPoint extends Component {
     cell: 'MapPosition',
   };
   draw() {
-    const { ctx } = this.systems.region;
+    const { ctx } = this.systems.region.mainLayer;
     const { position: { x, y } } = this.cell.state;
     if (!this.logic) {
       const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
@@ -117,19 +117,24 @@ export class MinimapLogic extends EventTrigger {
 
 // background of the minimap
 export class MinimapBackdrop extends Component {
+  logic: MinimapLogic;
+
   draw() {
-    const { ctx } = this.systems.region;
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
-    if (!logic) {
-      throw new Error('Could not find MinimapLogic component');
+    const { ctx } = this.systems.region.mainLayer;
+    if (!this.logic) {
+      const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+      if (!logic) {
+        throw new Error('Could not find MinimapLogic component');
+      }
+      this.logic = logic;
     }
     ctx.beginPath();
     ctx.fillStyle = 'white';
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 1;
     ctx.rect(
-      0 + Math.round(logic.bounds.position.x),
-      0 + Math.round(logic.bounds.position.y),
+      0 + Math.round(this.logic.bounds.position.x),
+      0 + Math.round(this.logic.bounds.position.y),
       MINIMAP_WIDTH,
       MINIMAP_HEIGHT,
     );
@@ -140,15 +145,20 @@ export class MinimapBackdrop extends Component {
 
 // minimap frame that represent's the viewport's current view
 export class MinimapFrame extends Component {
+  logic: MinimapLogic;
+
   draw() {
-    const { ctx } = this.systems.region;
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
-    if (!logic) {
-      throw new Error('Could not find MinimapLogic component');
+    const { ctx } = this.systems.region.mainLayer;
+    if (!this.logic) {
+      const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+      if (!logic) {
+        throw new Error('Could not find MinimapLogic component');
+      }
+      this.logic = logic;
     }
 
     ctx.save();
-    logic.bounds.draw(ctx);
+    this.logic.bounds.draw(ctx);
     ctx.clip();
 
     ctx.beginPath();
@@ -156,8 +166,8 @@ export class MinimapFrame extends Component {
     ctx.lineWidth = 1;
     const { width, height } = this.systems.viewport.getViewportRealSize();
     ctx.rect(
-      logic.bounds.position.x + 1.0 + Math.round((-this.systems.viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
-      logic.bounds.position.y + 1.0 + Math.round((-this.systems.viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
+      this.logic.bounds.position.x + 1.0 + Math.round((-this.systems.viewport.offset.x / SCENE_WIDTH) * MINIMAP_WIDTH),
+      this.logic.bounds.position.y + 1.0 + Math.round((-this.systems.viewport.offset.y / SCENE_HEIGHT) * MINIMAP_HEIGHT),
       Math.round(MINIMAP_WIDTH * (width / SCENE_WIDTH)),
       Math.round(MINIMAP_HEIGHT * (height / SCENE_HEIGHT)),
     );

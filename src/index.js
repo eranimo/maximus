@@ -21,9 +21,6 @@ export type Size = {
 window.onload = () => {
   // $FlowFixMe
   const mainCanvas: HTMLElement = document.getElementById('gameCanvas');
-  if (!mainCanvas) {
-    throw new Error('Fuck flowtype');
-  }
   mainCanvas.setAttribute('width', `${VIEWPORT_WIDTH}px`);
   mainCanvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
 

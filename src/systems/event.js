@@ -20,7 +20,7 @@ export default class EventSystem extends System {
 
   init() {
     this.viewport = this.systems.viewport;
-    this.canvas = this.systems.region.canvas;
+    this.canvas = this.systems.viewport.canvas;
     this.activeEvents = [];
     this.mouseMoveComponents = new Set();
     this.mouseClickLocations = new Map();
@@ -40,10 +40,10 @@ export default class EventSystem extends System {
     const { offsetX: x, offsetY: y } = event;
     const viewportPoint = new Point(x, y);
     const worldPoint: Point = this.viewport.viewportToWorld(viewportPoint);
-    this.getComponents().forEach((comp: ComponentClass) => {
+    for (const comp: ComponentClass of this.components) {
       const whichPoint = comp.constructor.eventType === 'viewport' ? viewportPoint : worldPoint;
       callback(comp, whichPoint);
-    });
+    }
   }
 
   update() {
@@ -67,7 +67,7 @@ export default class EventSystem extends System {
     }
     this.activeEvents = [];
 
-    for (const comp: ComponentClass of this.getComponents()) {
+    for (const comp: ComponentClass of this.components) {
       comp.update();
     }
   }

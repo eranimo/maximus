@@ -93,7 +93,15 @@ export type GameEvent = {
 
 export class System {
   manager: EntityManager;
+  components: Set<ComponentClass>;
   static componentTypes: Array<Class<ComponentClass>> = [];
+
+  refetch() {
+    this.components = new Set();
+    this.getComponents().forEach((comp: ComponentClass) => {
+      this.components.add(comp);
+    });
+  }
 
   get systems(): { [string]: $Subtype<System> } {
     return this.manager.systems;
@@ -135,12 +143,17 @@ export default class EntityManager {
     for (const [name, system]: [string, any] of Object.entries(this.systems)) {
       system.manager = this;
       system.init();
+      system.refetch();
     }
     this.events = new Set();
     this.eventListeners = new Map();
   }
 
-
+  refresh() {
+    for (const [name, system]: [string, any] of Object.entries(this.systems)) {
+      system.refetch();
+    }
+  }
 
   addEntity(entityType: Object, options: Object = {}): Entity {
     const entity: Entity = new Entity(entityType.name);

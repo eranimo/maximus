@@ -66,7 +66,7 @@ export default class SelectionSystem extends System {
   }
 
   draw() {
-    const ctx = this.systems.region.ctx;
+    const { ctx } = this.systems.region.mainLayer;
     const viewport = this.systems.viewport;
 
     // draw selected entities

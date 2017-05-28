@@ -10,5 +10,6 @@ export const VIEWPORT_HEIGHT = window && window.innerHeight;
 export const ZOOM_MIN = 0.2;
 export const ZOOM_MAX = 3.0;
 export const ZOOM_INTERVAL = 0.005;
+export const ZOOM_DEFAULT = 2.0;
 export const MINIMAP_WIDTH = 200;
 export const MINIMAP_HEIGHT = 200;

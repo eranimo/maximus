@@ -10,19 +10,19 @@ export default class RenderSystem extends System {
   ctx: CanvasRenderingContext2D;
 
   init() {
-    this.ctx = this.systems.region.ctx;
+    this.ctx = this.systems.viewport.ctx;
     this.viewport = this.systems.viewport;
   }
 
   update() {
-    for (const comp: ComponentClass of this.getComponents()) {
+    for (const comp: ComponentClass of this.components) {
       comp.update();
     }
   }
 
   draw() {
-    this.getComponents().forEach((comp: ComponentClass) => {
+    for (const comp: ComponentClass of this.components) {
       comp.draw(this.viewport, this.ctx);
-    });
+    }
   }
 }
