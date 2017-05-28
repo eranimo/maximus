@@ -197,18 +197,18 @@ export default class EntityManager {
 
   // update all entities
   update() {
-    for (const entity of this.entities) {
-      for (const instance: ComponentClass of entity.components) {
-        if (instance.waitUntilTime) {
-          if (this.systems.time.time > instance.waitUntilTime) {
-            delete instance.waitUntilTime;
-            instance.update();
-          }
-        } else {
-          instance.update();
-        }
-      }
-    }
+    // for (const entity of this.entities) {
+    //   for (const instance: ComponentClass of entity.components) {
+    //     if (instance.waitUntilTime) {
+    //       if (this.systems.time.time > instance.waitUntilTime) {
+    //         delete instance.waitUntilTime;
+    //         instance.update();
+    //       }
+    //     } else {
+    //       instance.update();
+    //     }
+    //   }
+    // }
     if (this.events.size > 0) {
       for (const event: GameEvent of this.events) {
         if (this.eventListeners.has(event.name)) {

@@ -15,9 +15,12 @@ import Layer from '../misc/layer';
 
 export default class Region extends System {
   world: World;
+
   gridLayer: Layer;
   terrainLayer: Layer;
   mainLayer: Layer;
+  minimapLayer: Layer;
+
   boardRect: Object;
   viewport: ViewportSystem;
   options: Object;
@@ -28,6 +31,7 @@ export default class Region extends System {
     this.terrainLayer = new Layer('terrain', 1);
     this.gridLayer = new Layer('grid', 2);
     this.mainLayer = new Layer('main', 3);
+    this.minimapLayer = new Layer('minimap', 4);
     console.log(this.mainLayer);
   }
 
@@ -42,6 +46,7 @@ export default class Region extends System {
     this.terrainLayer.clear();
     this.gridLayer.clear();
     this.mainLayer.clear();
+    this.minimapLayer.clear();
 
     this.drawGrid();
     this.drawDevInfo(timeSinceLastUpdate);
