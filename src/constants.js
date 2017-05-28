@@ -1,7 +1,7 @@
 // @flow
 
-export const SCENE_CELLS_WIDTH = 500;
-export const SCENE_CELLS_HEIGHT = 500;
+export const SCENE_CELLS_WIDTH = 100;
+export const SCENE_CELLS_HEIGHT = 100;
 export const CELL_SIZE = 20;
 export const SCENE_WIDTH = SCENE_CELLS_WIDTH * CELL_SIZE;
 export const SCENE_HEIGHT = SCENE_CELLS_HEIGHT * CELL_SIZE;

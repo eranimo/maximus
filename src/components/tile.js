@@ -10,10 +10,12 @@ import type { MapPosition } from './position';
 
 export class Tile extends Component {
   state: {
-    color: Color,
-    opacity: number,
+    spritemap: string,
+    row: number,
+    col: number,
   };
   cell: MapPosition;
+  position: Point;
 
   static initialState = {
     sprite: new Color(0, 0, 255),
@@ -23,20 +25,39 @@ export class Tile extends Component {
     cell: 'MapPosition',
   }
 
-  draw() {
-    const { ctx } = this.systems.region;
-    const { sprite } = this.state;
+  init() {
     const { position: { x, y } } = this.cell.state;
+    this.position = new Point(x * CELL_SIZE, y * CELL_SIZE);
+  }
+
+  draw() {
+    // console.time('draw tile');
+    const { ctx } = this.systems.region;
+    const { spritemap, row, col } = this.state;
+    const { image, size } = this.resources.spritemaps[spritemap];
+
+    // const { position } = this.cell.state;
+    // const drawPosition = this.systems.viewport.worldToViewport(position.multiply(CELL_SIZE));
+    // ctx.drawImage(
+    //   image,
+    //   drawPosition.x,
+    //   drawPosition.y,
+    //   this.systems.viewport.toZoom(CELL_SIZE),
+    //   this.systems.viewport.toZoom(CELL_SIZE),
+    // );
 
     const intersect = this.systems.viewport.calculateBounds(
-      new Point(x * CELL_SIZE, y * CELL_SIZE),
+      this.position,
       CELL_SIZE,
       CELL_SIZE,
     );
     if (intersect) {
-      const image = this.resources.sprites[sprite].image;
       ctx.drawImage(
         image,
+        (col - 1) * size,
+        (row - 1) * size,
+        size,
+        size,
         intersect.topLeft.x,
         intersect.topLeft.y,
         intersect.width,
@@ -49,6 +70,7 @@ export class Tile extends Component {
       //   intersect.height,
       // );
     }
+    // console.timeEnd('draw tile');
   }
 }
 
@@ -69,13 +91,13 @@ export class BoxTrigger extends EventTrigger {
     );
   }
 
-  onMouseEnter() {
-    this.tile.state.opacity = 0.5;
-  }
-
-  onMouseLeave() {
-    this.tile.state.opacity = 1;
-  }
+  // onMouseEnter() {
+  //   this.tile.state.opacity = 0.5;
+  // }
+  //
+  // onMouseLeave() {
+  //   this.tile.state.opacity = 1;
+  // }
 
   onMouseUp() {
     // this.tile.state.color = Color.random();

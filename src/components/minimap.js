@@ -23,6 +23,7 @@ export class MinimapPoint extends Component {
     color: Color
   };
   cell: MapPosition;
+  logic: MinimapLogic;
 
   static initialState = {
     color: new Color(100, 100, 100),
@@ -31,20 +32,22 @@ export class MinimapPoint extends Component {
   static dependencies = {
     cell: 'MapPosition',
   };
-
   draw() {
     const { ctx } = this.systems.region;
     const { position: { x, y } } = this.cell.state;
-    const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
-    if (!logic) {
-      throw new Error('Could not find MinimapLogic component');
+    if (!this.logic) {
+      const logic: ?MinimapLogic = this.entity.manager.getComponents('MinimapLogic')[0];
+      if (!logic) {
+        throw new Error('Could not find MinimapLogic component');
+      }
+      this.logic = logic;
     }
 
     ctx.beginPath();
     ctx.fillStyle = this.state.color.toRGBA();
     ctx.fillRect(
-      0.5 + logic.bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
-      0.5 + logic.bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
+      0.5 + this.logic.bounds.position.x + Math.round((x / SCENE_CELLS_WIDTH) * MINIMAP_WIDTH),
+      0.5 + this.logic.bounds.position.y + Math.round((y / SCENE_CELLS_HEIGHT) * MINIMAP_HEIGHT),
       1,
       1,
     );

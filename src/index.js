@@ -28,13 +28,11 @@ window.onload = () => {
   mainCanvas.setAttribute('height', `${VIEWPORT_HEIGHT}px`);
 
   loadTilemap()
-    .then((sprites: Object) => {
-      console.log(sprites);
+    .then((spritemaps: Object) => {
+      console.log(spritemaps);
       const world: World = new World({
         main: mainCanvas,
-        resources: {
-          sprites
-        }
+        resources: { spritemaps }
       });
       world.loop();
     })

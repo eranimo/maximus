@@ -56,10 +56,10 @@ export class MapPosition extends EventTrigger {
   }
 
   init() {
-    this.systems.grid.registerCell(this);
+    // this.systems.grid.registerCell(this);
   }
 
   onMouseUp() {
-    this.systems.grid.activeCell = this;
+    // this.systems.grid.activeCell = this;
   }
 }

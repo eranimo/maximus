@@ -1,46 +1,20 @@
-// @flow
-
-
+/* eslint-disable */
 // Taken from https://developers.google.com/web/updates/2016/03/createimagebitmap-in-chrome-50
 
-self.addEventListener('message', (event: MessageEvent) => {
-  const {
-    url,
-    sprites,
-    size
-  }: {
-    url: string,
-    sprites: { [string]: Object },
-    size: number
-  } = (event.data: any);
-
-  fetch(url)
-    .then((response: Object): Blob => response.blob())
-    .then((blob: Object): Promise<any> => {
-      return Promise.all(
-        Object.entries(sprites)
-          .map(([name, coord]: [string, any]): Promise<ImageBitmap> => {
-            return new Promise((resolve: Function) => {
-              self.createImageBitmap(
-                blob,
-                (coord.col - 1) * size,
-                (coord.row - 1) * size,
-                size,
-                size,
-              ).then((image: ImageBitmap) => {
-                resolve({
-                  image,
-                  name,
-                  size,
-                  ...coord,
-                });
-              });
-            });
-          })
+self.addEventListener('message', event => {
+  Promise.all(event.data.map(({ url }) => fetch(url)))
+    .then(responses => Promise.all(responses.map(response => response.blob())))
+    .then(blobs => Promise.all(blobs.map(blob => self.createImageBitmap(blob))))
+    .then((spritemaps) => {
+      self.postMessage(
+        event.data.map((spritemap, index) => {
+          return {
+            ...spritemap,
+            image: spritemaps[index],
+          };
+        }),
+        spritemaps
       );
-    })
-    .then((sprites: Object) => {
-      self.postMessage(sprites, sprites.map((sprite: Object): ImageBitmap => sprite.image));
     }, (err: Error) => {
       self.postMessage({ err });
     });

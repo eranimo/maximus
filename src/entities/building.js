@@ -18,9 +18,11 @@ const Building: EntityType = {
         type: 'world',
       }),
       new Tile({
-        sprite: 'desert',
+        spritemap: 'main',
+        row: 4,
+        col: 2,
       }),
-      new MinimapPoint(),
+      // new MinimapPoint(),
       // new WorldText({
       //   font: 'sans-serif',
       //   size: 7,
@@ -29,9 +31,9 @@ const Building: EntityType = {
       //   text: `${position.x},${position.y}`,
       //   position: position,
       // }),
-      new BoxTrigger({
-        type: 'world',
-      }),
+      // new BoxTrigger({
+      //   type: 'world',
+      // }),
     ];
   }
 };

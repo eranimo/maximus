@@ -323,6 +323,21 @@ export default class ViewportSystem extends System {
            this.topLeft.y >= point.y && point.y <= this.bottomRight.y;
   }
 
+  isRectInViewport(loc: Point, width: number, height: number): boolean {
+    const loc2 = new Point(loc.x + width, loc.y + height);
+    const loc3 = new Point(loc.x, loc.y + height);
+    const loc4 = new Point(loc.x + width, loc.y);
+    if (
+      this.isInViewport(this.worldToViewport(loc)) ||
+      this.isInViewport(this.worldToViewport(loc2)) ||
+      this.isInViewport(this.worldToViewport(loc3)) ||
+      this.isInViewport(this.worldToViewport(loc4))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   calculateBounds(loc: Point, width: number, height: number): ?Object {
     const loc2 = new Point(loc.x + width, loc.y + height);
     const loc3 = new Point(loc.x, loc.y + height);

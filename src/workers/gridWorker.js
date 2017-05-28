@@ -25,7 +25,6 @@ const events = {
 
 self.addEventListener('message', (event: MessageEvent) => {
   const { type, payload } = (event.data: any);
-  console.log(type);
   if (type in events) {
     events[type](payload);
   }

@@ -1,5 +1,7 @@
 // @flow
 import {
+  SCENE_CELLS_WIDTH,
+  SCENE_CELLS_HEIGHT,
   SCENE_WIDTH,
   SCENE_HEIGHT,
   VIEWPORT_WIDTH,
@@ -60,10 +62,12 @@ export default class World {
       position: new Point(10, 10)
     });
 
-    for (let i = 5; i < 15; i++) {
-      this.manager.addEntity(Building, {
-        position: new Point(15, i),
-      });
+    for (let x = 0; x < SCENE_CELLS_WIDTH; x++) {
+      for (let y = 0; y < SCENE_CELLS_HEIGHT; y++) {
+        this.manager.addEntity(Building, {
+          position: new Point(x, y),
+        });
+      }
     }
 
     const someone = this.manager.addEntity(Person, {
