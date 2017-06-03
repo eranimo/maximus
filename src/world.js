@@ -22,11 +22,10 @@ import TimeSystem from './systems/time';
 import SelectionSystem from './systems/selection';
 import KeyboardSystem from './systems/keyboard';
 import MovementSystem from './systems/movement';
-
-import { VIEWPORT_MOVE } from './events';
 import Building from './entities/building';
 import Person from './entities/person';
 import initUI from './ui';
+import Stats from 'stats.js';
 
 
 export default class World {
@@ -34,6 +33,7 @@ export default class World {
   ctx: CanvasRenderingContext2D;
   manager: EntityManager;
   uiState: Object;
+  stats: Stats;
 
   constructor({ main, resources }: { main: HTMLElement, resources: Object }) {
     this.manager = new EntityManager({
@@ -84,6 +84,11 @@ export default class World {
     walk[0].goTo(Point.random(100, 100).multiply(CELL_SIZE));
     this.manager.refresh();
     window.manager = this.manager;
+
+    this.stats = new Stats();
+    // $FlowFixMe
+    document.body.appendChild(this.stats.dom);
+    this.stats.showPanel(0);
   }
 
   draw(timeSinceLastUpdate: number) {
@@ -107,6 +112,7 @@ export default class World {
     let timeOfLastExecution;
     let timeSinceLastUpdate = 0;
     const execute = () => {
+      this.stats.begin();
       const now = Date.now();
 
       // time since last execution
@@ -125,6 +131,7 @@ export default class World {
       }
       this.draw(timeSinceLastUpdate);
       timeSinceLastUpdate = 0;
+      this.stats.end();
       requestAnimationFrame(execute);
     };
 
